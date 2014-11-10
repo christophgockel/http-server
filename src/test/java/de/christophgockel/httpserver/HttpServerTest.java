@@ -1,6 +1,5 @@
 package de.christophgockel.httpserver;
 
-import de.christophgockel.httpserver.HttpServer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
