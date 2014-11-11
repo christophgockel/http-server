@@ -35,7 +35,7 @@ public class HttpServer {
   public void start() throws IOException {
     isRunning = true;
 
-//    while (true) {
+    while (true) {
       final Socket s = socket.accept();
       Runnable r = new Runnable() {
         @Override
@@ -44,35 +44,20 @@ public class HttpServer {
             DataOutputStream out;
             out = new DataOutputStream(s.getOutputStream());
 
-            DataInputStream in;
-            in = new DataInputStream(s.getInputStream());
-            InputStreamReader reader = new InputStreamReader(in);
-            BufferedReader read = new BufferedReader(reader);
-
-            String line;
             String content = "";
 
-            while (true) {
-              line = read.readLine();
-              if (line.equals("")) {
-                break;
-              }
-
-              content += line;
-            }
-
-            System.out.println("GOT:\n" + content);
+            HttpRequest request = new HttpRequest(s.getInputStream());
 
             out.writeBytes("HTTP/1.1 200 OK\r\n\r\n");
             out.close();
           } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
           }
         }
       };
 
       threadPool.execute(r);
-//    }
+    }
   }
 
   public boolean isRunning() {

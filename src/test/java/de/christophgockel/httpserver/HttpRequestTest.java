@@ -40,8 +40,18 @@ public class HttpRequestTest {
   }
 
   @Test
-  public void returnsTheBody() {
+  public void ignoresBodyContentIfContentLengthHeaderIsMissing() {
     String request = "POST / HTTP/1.1\r\n" +
+                     "\r\n" +
+                     "var=value";
+
+    assertEquals("", requestFor(request).getBody());
+  }
+
+  @Test
+  public void returnsBodyContentIfContentLengthHeaderIsPresent() {
+    String request = "POST / HTTP/1.1\r\n" +
+                     "Content-Length: 9\r\n" +
                      "\r\n" +
                      "var=value";
 
@@ -52,10 +62,12 @@ public class HttpRequestTest {
   public void parsesFullRequest() {
     String content = "PUT / HTTP/1.1\r\n" +
                      "Accept-Charset: utf-8\r\n" +
+                     "Content-Length: 9\r\n" +
                      "\r\n" +
                      "some body";
     Map<String, String> headers = new HashMap<>();
     headers.put("Accept-Charset", "utf-8");
+    headers.put("Content-Length", "9");
 
     HttpRequest request = requestFor(content);
 
@@ -83,7 +95,7 @@ public class HttpRequestTest {
   @Test(expected = HttpRequest.MalformedException.class)
   public void throwExceptionForMalformedHeaders() {
     String content = "PUT / HTTP/1.1\r\n" +
-                     "Accept-Charset:";
+                     "Accept-Charset";
     requestFor(content);
   }
 
