@@ -2,6 +2,7 @@ package de.christophgockel.httpserver;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.net.Socket;
 
 import static org.junit.Assert.*;
 
+@Ignore
 public class HttpServerTest {
   private HttpServer server;
   private int port;
