@@ -1,8 +1,10 @@
 package de.christophgockel.httpserver;
 
-import de.christophgockel.httpserver.http.MethodDispatcher;
+import de.christophgockel.httpserver.filesystem.FileSystem;
 import de.christophgockel.httpserver.http.Request;
-import de.christophgockel.httpserver.http.method.*;
+import de.christophgockel.httpserver.routes.Router;
+import de.christophgockel.httpserver.routes.responders.DefaultResponder;
+import de.christophgockel.httpserver.routes.responders.OptionsResponder;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -15,6 +17,7 @@ public class HttpServer {
   private final int port;
   private final String documentRoot;
   private boolean isRunning;
+  private final FileSystem fileSystem;
 
   private final ServerSocket socket;
   Executor threadPool;
@@ -27,6 +30,7 @@ public class HttpServer {
 
     socket = new ServerSocket(this.port);
     threadPool = Executors.newFixedThreadPool(5);
+    fileSystem = new FileSystem(this.documentRoot);
   }
 
   public int getPort() {
@@ -51,14 +55,11 @@ public class HttpServer {
 
             Request request = new Request(s.getInputStream());
 
-            MethodDispatcher dispatcher = new MethodDispatcher();
-            dispatcher.addHandler(RequestMethod.GET, new Get());
-            dispatcher.addHandler(RequestMethod.POST, new Post());
-            dispatcher.addHandler(RequestMethod.PUT, new Put());
-            dispatcher.addHandler(RequestMethod.HEAD, new Head());
-            dispatcher.addHandler(RequestMethod.OPTIONS, new Options());
+            Router router = new Router(new DefaultResponder(fileSystem));
+            router.add("/method_options", new OptionsResponder());
 
-            out.writeBytes(dispatcher.process(request));
+            out.writeBytes(router.dispatch(request));
+
             out.close();
           } catch (IOException e) {
             throw new RuntimeException(e);
