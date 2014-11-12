@@ -1,7 +1,6 @@
 package de.christophgockel.httpserver.routes;
 
-import de.christophgockel.httpserver.http.Request;
-import de.christophgockel.httpserver.routes.responders.BaseResponder;
+import de.christophgockel.httpserver.routes.responders.DummyResponder;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -19,15 +18,8 @@ public class RouterTest {
   public void matchesKnownRoutes() {
     Router router = new Router(new DummyResponder());
 
-    router.add("/the/route", new BaseResponder());
+    router.add("/the/route", new DummyResponder());
 
     assertTrue(router.matches("/the/route"));
-  }
-
-  private class DummyResponder extends BaseResponder {
-    @Override
-    public String handle(Request request) {
-      return "";
-    }
   }
 }

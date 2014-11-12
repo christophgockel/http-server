@@ -1,5 +1,6 @@
 package de.christophgockel.httpserver.routes.responders;
 
+import de.christophgockel.httpserver.RequestMethod;
 import de.christophgockel.httpserver.filesystem.FileSystem;
 import de.christophgockel.httpserver.helper.RequestHelper;
 import de.christophgockel.httpserver.http.Request;
@@ -12,6 +13,8 @@ import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class DefaultResponderTest {
   @Rule
@@ -24,10 +27,23 @@ public class DefaultResponderTest {
   }
 
   @Test
+  public void respondsToAllGetRequests() {
+    assertTrue(responder.respondsTo(RequestMethod.GET, "/"));
+    assertTrue(responder.respondsTo(RequestMethod.GET, "/something"));
+    assertTrue(responder.respondsTo(RequestMethod.GET, "/some/other/path"));
+  }
+
+  @Test
+  public void doesNotRespondToNonGetRequest() {
+    assertFalse(responder.respondsTo(RequestMethod.POST, "/"));
+    assertFalse(responder.respondsTo(RequestMethod.PUT, "/"));
+  }
+
+  @Test
   public void respondsWith200OK() throws IOException {
     Request request = RequestHelper.requestFor("GET / HTTP/1.1");
 
-    assertThat(responder.handle(request), containsString("200 OK"));
+    assertThat(responder.respond(request), containsString("200 OK"));
   }
 
   @Test
@@ -36,7 +52,7 @@ public class DefaultResponderTest {
     documentRoot.newFile("file_2.txt");
     Request request = RequestHelper.requestFor("GET / HTTP/1.1");
 
-    assertThat(responder.handle(request), containsString("file_1.txt"));
-    assertThat(responder.handle(request), containsString("file_2.txt"));
+    assertThat(responder.respond(request), containsString("file_1.txt"));
+    assertThat(responder.respond(request), containsString("file_2.txt"));
   }
 }

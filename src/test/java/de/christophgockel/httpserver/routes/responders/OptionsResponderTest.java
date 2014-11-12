@@ -1,5 +1,6 @@
 package de.christophgockel.httpserver.routes.responders;
 
+import de.christophgockel.httpserver.RequestMethod;
 import de.christophgockel.httpserver.helper.RequestHelper;
 import de.christophgockel.httpserver.http.Request;
 import org.junit.Before;
@@ -9,6 +10,8 @@ import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class OptionsResponderTest {
   private BaseResponder responder;
@@ -19,16 +22,26 @@ public class OptionsResponderTest {
   }
 
   @Test
-  public void respondsWith200OK() throws IOException {
-    Request request = RequestHelper.requestFor("GET / HTTP/1.1");
+  public void respondsToNoParticularResource() {
+    assertTrue(responder.respondsTo(RequestMethod.OPTIONS, "/"));
+  }
 
-    assertThat(responder.handle(request), containsString("200 OK"));
+  @Test
+  public void doesNotRespondToNonOptionsRequests() {
+    assertFalse(responder.respondsTo(RequestMethod.GET, "/"));
+  }
+
+  @Test
+  public void respondsWith200OK() throws IOException {
+    Request request = RequestHelper.requestFor("OPTIONS * HTTP/1.1");
+
+    assertThat(responder.respond(request), containsString("200 OK"));
   }
 
   @Test
   public void responseContainsAllowedMethods() throws IOException {
-    Request request = RequestHelper.requestFor("GET / HTTP/1.1");
+    Request request = RequestHelper.requestFor("OPTIONS * HTTP/1.1");
 
-    assertThat(responder.handle(request), containsString("Allow:"));
+    assertThat(responder.respond(request), containsString("Allow:"));
   }
 }
