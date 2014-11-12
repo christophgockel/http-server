@@ -7,10 +7,10 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
-public class OptionTest {
+public class OptionsTest {
   @Test
   public void returnsAllowHeader() {
-    Method options = new Option();
+    Method options = new Options();
     Request request = RequestHelper.requestFor("OPTIONS * HTTP/1.1");
 
     String response = options.process(request);

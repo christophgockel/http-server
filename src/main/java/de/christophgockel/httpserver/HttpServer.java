@@ -1,6 +1,11 @@
 package de.christophgockel.httpserver;
 
-import java.io.*;
+import de.christophgockel.httpserver.http.MethodDispatcher;
+import de.christophgockel.httpserver.http.Request;
+import de.christophgockel.httpserver.http.method.*;
+
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.Executor;
@@ -44,11 +49,16 @@ public class HttpServer {
             DataOutputStream out;
             out = new DataOutputStream(s.getOutputStream());
 
-            String content = "";
+            Request request = new Request(s.getInputStream());
 
-            HttpRequest request = new HttpRequest(s.getInputStream());
+            MethodDispatcher dispatcher = new MethodDispatcher();
+            dispatcher.addHandler(RequestMethod.GET, new Get());
+            dispatcher.addHandler(RequestMethod.POST, new Post());
+            dispatcher.addHandler(RequestMethod.PUT, new Put());
+            dispatcher.addHandler(RequestMethod.HEAD, new Head());
+            dispatcher.addHandler(RequestMethod.OPTIONS, new Options());
 
-            out.writeBytes("HTTP/1.1 200 OK\r\n\r\n");
+            out.writeBytes(dispatcher.process(request));
             out.close();
           } catch (IOException e) {
             throw new RuntimeException(e);

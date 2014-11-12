@@ -2,13 +2,12 @@ package de.christophgockel.httpserver.http.method;
 
 import de.christophgockel.httpserver.http.Request;
 
-public class Option implements Method {
+public class Post implements Method {
   @Override
   public String process(Request request) {
     String response;
 
-    response = "HTTP/1.1 200 OK\r\n";
-    response += "Allow: GET,HEAD,POST,OPTIONS,PUT\n\r\n\r\n";
+    response = "HTTP/1.1 200 OK\r\n\r\n";
 
     return response;
   }
