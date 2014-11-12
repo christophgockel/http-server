@@ -1,5 +1,7 @@
-package de.christophgockel.httpserver;
+package de.christophgockel.httpserver.http;
 
+import de.christophgockel.httpserver.RequestMethod;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -8,16 +10,16 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public class HttpRequestTest {
+public class RequestTest {
   @Test
   public void knowsTheDifferentRequestMethods() {
-    assertEquals(RequestMethod.GET,      methodFor("GET / HTTP/1.1"));
-    assertEquals(RequestMethod.POST,     methodFor("POST / HTTP/1.1"));
-    assertEquals(RequestMethod.HEAD,     methodFor("HEAD / HTTP/1.1"));
-    assertEquals(RequestMethod.DELETE,   methodFor("DELETE / HTTP/1.1"));
-    assertEquals(RequestMethod.TRACE,    methodFor("TRACE / HTTP/1.1"));
-    assertEquals(RequestMethod.CONNECT,  methodFor("CONNECT / HTTP/1.1"));
-    assertEquals(RequestMethod.OPTIONS,  methodFor("OPTIONS / HTTP/1.1"));
+    Assert.assertEquals(RequestMethod.GET, methodFor("GET / HTTP/1.1"));
+    assertEquals(RequestMethod.POST, methodFor("POST / HTTP/1.1"));
+    assertEquals(RequestMethod.HEAD, methodFor("HEAD / HTTP/1.1"));
+    assertEquals(RequestMethod.DELETE, methodFor("DELETE / HTTP/1.1"));
+    assertEquals(RequestMethod.TRACE, methodFor("TRACE / HTTP/1.1"));
+    assertEquals(RequestMethod.CONNECT, methodFor("CONNECT / HTTP/1.1"));
+    assertEquals(RequestMethod.OPTIONS, methodFor("OPTIONS / HTTP/1.1"));
   }
 
   @Test
@@ -69,7 +71,7 @@ public class HttpRequestTest {
     headers.put("Accept-Charset", "utf-8");
     headers.put("Content-Length", "9");
 
-    HttpRequest request = requestFor(content);
+    Request request = requestFor(content);
 
     assertEquals(RequestMethod.PUT, request.getMethod());
     assertEquals("/", request.getURI());
@@ -77,7 +79,7 @@ public class HttpRequestTest {
     assertEquals("some body", request.getBody());
   }
 
-  @Test(expected = HttpRequest.MalformedException.class)
+  @Test(expected = Request.MalformedException.class)
   public void throwsExceptionOnMalformedRequest() {
     requestFor("");
   }
@@ -87,12 +89,12 @@ public class HttpRequestTest {
     methodFor("SOMETHING / HTTP/1.1");
   }
 
-  @Test(expected = HttpRequest.MalformedException.class)
+  @Test(expected = Request.MalformedException.class)
   public void throwsExceptionOnMalformedRequestLine() {
     requestFor("GET");
   }
 
-  @Test(expected = HttpRequest.MalformedException.class)
+  @Test(expected = Request.MalformedException.class)
   public void throwExceptionForMalformedHeaders() {
     String content = "PUT / HTTP/1.1\r\n" +
                      "Accept-Charset";
@@ -107,7 +109,7 @@ public class HttpRequestTest {
     return requestFor(requestLine).getURI();
   }
 
-  private HttpRequest requestFor(String requestLine) {
-    return new HttpRequest(new ByteArrayInputStream(requestLine.getBytes()));
+  private Request requestFor(String requestLine) {
+    return new Request(new ByteArrayInputStream(requestLine.getBytes()));
   }
 }

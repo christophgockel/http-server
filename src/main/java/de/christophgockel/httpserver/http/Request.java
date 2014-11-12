@@ -1,4 +1,6 @@
-package de.christophgockel.httpserver;
+package de.christophgockel.httpserver.http;
+
+import de.christophgockel.httpserver.RequestMethod;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,13 +10,13 @@ import java.nio.CharBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HttpRequest {
-  private RequestMethod       method;
+public class Request {
+  private RequestMethod method;
   private String              uri;
   private Map<String, String> headers;
   private String              body;
 
-  public HttpRequest(InputStream input) {
+  public Request(InputStream input) {
     headers = new HashMap<>();
     body = "";
     parseRequest(new BufferedReader(new InputStreamReader(input)));
