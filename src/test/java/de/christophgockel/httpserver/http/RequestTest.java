@@ -1,10 +1,10 @@
 package de.christophgockel.httpserver.http;
 
 import de.christophgockel.httpserver.RequestMethod;
+import de.christophgockel.httpserver.helper.RequestHelper;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -110,6 +110,6 @@ public class RequestTest {
   }
 
   private Request requestFor(String requestLine) {
-    return new Request(new ByteArrayInputStream(requestLine.getBytes()));
+    return RequestHelper.requestFor(requestLine);
   }
 }
