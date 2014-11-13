@@ -6,11 +6,14 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class FileSystemTest {
   @Rule
@@ -18,6 +21,24 @@ public class FileSystemTest {
 
   @Before
   public void setup() {
+  }
+
+  @Test
+  public void knowsIfAPathIsAFile() throws IOException {
+    FileSystem fs = new FileSystem(documentRoot.getRoot());
+
+    documentRoot.newFile("file_1.txt");
+
+    assertTrue(fs.isFile("file_1.txt"));
+  }
+
+  @Test
+  public void knowsIfAPathIsADirectory() throws IOException {
+    FileSystem fs = new FileSystem(documentRoot.getRoot());
+
+    documentRoot.newFolder("sub");
+
+    assertTrue(fs.isDirectory("sub"));
   }
 
   @Test
@@ -47,5 +68,39 @@ public class FileSystemTest {
     files.add("sub/file_3.txt");
 
     assertEquals(files, fs.getAvailableFiles());
+  }
+
+  @Test
+  public void listsContentsOfSubdirectories() throws IOException {
+    FileSystem fs = new FileSystem(documentRoot.getRoot());
+    List<File> listing = new ArrayList<>();
+
+    documentRoot.newFile("file.txt");
+    documentRoot.newFolder("sub");
+    listing.add(documentRoot.newFile("sub/file_1.txt"));
+    listing.add(documentRoot.newFile("sub/file_2.txt"));
+
+    assertEquals(listing, fs.getFiles("sub"));
+  }
+
+  @Test
+  public void providesFileContents() throws IOException {
+    FileSystem fs = new FileSystem(documentRoot.getRoot());
+
+    File file = documentRoot.newFile("file.txt");
+    FileWriter fw = new FileWriter(file);
+    fw.write("something");
+    fw.close();
+
+    assertArrayEquals("something".getBytes(), fs.getFileContent("file.txt"));
+  }
+
+  @Test
+  public void providesMimeTypeInformation() throws IOException {
+    FileSystem fs = new FileSystem(documentRoot.getRoot());
+
+    documentRoot.newFile("file.txt");
+
+    assertEquals("text/plain", fs.getMimeType("file.txt"));
   }
 }

@@ -44,7 +44,7 @@ public class DefaultResponderTest {
   public void respondsWith200OK() throws IOException {
     Request request = RequestHelper.requestFor("GET / HTTP/1.1");
 
-    assertThat(responder.respond(request), containsString("200 OK"));
+    assertContains(responder.respond(request), "200 OK");
   }
 
   @Test
@@ -53,8 +53,8 @@ public class DefaultResponderTest {
     documentRoot.newFile("file_2.txt");
     Request request = RequestHelper.requestFor("GET / HTTP/1.1");
 
-    assertThat(responder.respond(request), containsString("file_1.txt"));
-    assertThat(responder.respond(request), containsString("file_2.txt"));
+    assertContains(responder.respond(request), "file_1.txt");
+    assertContains(responder.respond(request), "file_2.txt");
   }
 
   @Test
@@ -65,8 +65,31 @@ public class DefaultResponderTest {
     documentRoot.newFile("sub/another_file.txt");
     Request request = RequestHelper.requestFor("GET /sub HTTP/1.1");
 
-    assertThat(responder.respond(request), not(containsString("file_1.txt")));
-    assertThat(responder.respond(request), containsString("file.txt"));
-    assertThat(responder.respond(request), containsString("another_file.txt"));
+    assertNotContains(responder.respond(request), "file_1.txt");
+    assertContains(responder.respond(request), "file.txt");
+    assertContains(responder.respond(request), "another_file.txt");
+  }
+
+  @Test
+  public void servesFiles() throws IOException {
+    documentRoot.newFile("picture.jpg");
+    Request request = RequestHelper.requestFor("GET /picture.jpg HTTP/1.1");
+
+    assertContains(responder.respond(request), "Content-Type: image/jpeg");
+  }
+
+  private void assertContains(byte[] actual, String expected) {
+    assertThat(new String(actual), containsString(expected));
+  }
+
+  private void assertNotContains(byte[] actual, String expected) {
+    assertThat(new String(actual), not(containsString(expected)));
+  }
+
+  @Test
+  public void returns404ForUnknownFiles() {
+    Request request = RequestHelper.requestFor("GET /unknown.jpg HTTP/1.1");
+
+    assertContains(responder.respond(request), "404 Not Found");
   }
 }

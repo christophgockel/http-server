@@ -23,7 +23,7 @@ public class Router {
     routes.put(path, responder);
   }
 
-  public String dispatch(Request request) {
+  public byte[] dispatch(Request request) {
     BaseResponder responder = routes.get(request.getURI());
 
     if (responder == null) {

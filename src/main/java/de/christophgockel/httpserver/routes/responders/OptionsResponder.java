@@ -10,12 +10,12 @@ public class OptionsResponder extends BaseResponder {
   }
 
   @Override
-  protected String respond(Request request) {
+  protected byte[] respond(Request request) {
     String response;
 
     response = "HTTP/1.1 200 OK\r\n";
     response += "Allow: GET,HEAD,POST,OPTIONS,PUT\n\r\n\r\n";
 
-    return response;
+    return response.getBytes();
   }
 }

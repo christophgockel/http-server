@@ -35,13 +35,17 @@ public class OptionsResponderTest {
   public void respondsWith200OK() throws IOException {
     Request request = RequestHelper.requestFor("OPTIONS * HTTP/1.1");
 
-    assertThat(responder.respond(request), containsString("200 OK"));
+    assertContains(responder.respond(request), "200 OK");
   }
 
   @Test
   public void responseContainsAllowedMethods() throws IOException {
     Request request = RequestHelper.requestFor("OPTIONS * HTTP/1.1");
 
-    assertThat(responder.respond(request), containsString("Allow:"));
+    assertContains(responder.respond(request), "Allow:");
+  }
+
+  private void assertContains(byte[] actual, String expected) {
+    assertThat(new String(actual), containsString(expected));
   }
 }
