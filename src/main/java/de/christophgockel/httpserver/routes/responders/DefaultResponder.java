@@ -1,12 +1,12 @@
 package de.christophgockel.httpserver.routes.responders;
 
 import de.christophgockel.httpserver.RequestMethod;
+import de.christophgockel.httpserver.http.Response;
+import de.christophgockel.httpserver.StatusCode;
 import de.christophgockel.httpserver.filesystem.FileSystem;
 import de.christophgockel.httpserver.http.Request;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 
 public class DefaultResponder extends BaseResponder {
   private final FileSystem fileSystem;
@@ -21,7 +21,7 @@ public class DefaultResponder extends BaseResponder {
   }
 
   @Override
-  protected byte[] respond(Request request) {
+  protected Response respond(Request request) {
     String body = "<html><head><title>Something</title></head><body>";
 
     String requestedResource = request.getURI();
@@ -30,23 +30,11 @@ public class DefaultResponder extends BaseResponder {
       String mimeType = fileSystem.getMimeType(requestedResource);
       byte[] content = fileSystem.getFileContent(requestedResource);
 
+      Response response = new Response(StatusCode.OK);
+      response.addHeader("Content-Type", mimeType);
+      response.setBody(content);
 
-      byte[] header = ("HTTP/1.1 200 OK\r\n" +
-        "Content-Type: " + mimeType + "\r\n" +
-        "\r\n").getBytes();
-
-      ByteArrayOutputStream response = new ByteArrayOutputStream();
-      response.write(header, 0, header.length);
-      response.write(content, 0, content.length);
-
-      byte[] thing = response.toByteArray();
-      try {
-        response.close();
-      } catch (IOException e) {
-        return "".getBytes();
-      }
-
-      return thing;
+      return response;
     } else if (fileSystem.isDirectory(requestedResource)) {
       body += "<ul>";
 
@@ -57,12 +45,13 @@ public class DefaultResponder extends BaseResponder {
       body += "</ul>";
       body += "</body></html>";
 
-      return ("HTTP/1.1 200 OK\r\n" +
-        "Content-Type: text/html\r\n" +
-        "\r\n" +
-        body).getBytes();
+      Response response = new Response(StatusCode.OK);
+      response.addHeader("Content-Type", "text/html");
+      response.setBody(body);
+
+      return response;
     } else {
-      return "HTTP/1.1 404 Not Found\r\n".getBytes();
+      return new Response(StatusCode.NOT_FOUND);
     }
   }
 }

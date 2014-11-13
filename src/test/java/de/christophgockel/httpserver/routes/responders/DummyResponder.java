@@ -1,6 +1,7 @@
 package de.christophgockel.httpserver.routes.responders;
 
 import de.christophgockel.httpserver.RequestMethod;
+import de.christophgockel.httpserver.http.Response;
 import de.christophgockel.httpserver.http.Request;
 
 public class DummyResponder extends BaseResponder {
@@ -10,7 +11,7 @@ public class DummyResponder extends BaseResponder {
   }
 
   @Override
-  protected byte[] respond(Request request) {
-    return "".getBytes();
+  protected Response respond(Request request) {
+    return new Response();
   }
 }

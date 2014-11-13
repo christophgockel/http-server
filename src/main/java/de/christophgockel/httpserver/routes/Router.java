@@ -1,5 +1,6 @@
 package de.christophgockel.httpserver.routes;
 
+import de.christophgockel.httpserver.http.Response;
 import de.christophgockel.httpserver.http.Request;
 import de.christophgockel.httpserver.routes.responders.BaseResponder;
 
@@ -23,7 +24,7 @@ public class Router {
     routes.put(path, responder);
   }
 
-  public byte[] dispatch(Request request) {
+  public Response dispatch(Request request) {
     BaseResponder responder = routes.get(request.getURI());
 
     if (responder == null) {

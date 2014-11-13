@@ -1,6 +1,8 @@
 package de.christophgockel.httpserver.routes.responders;
 
 import de.christophgockel.httpserver.RequestMethod;
+import de.christophgockel.httpserver.http.Response;
+import de.christophgockel.httpserver.StatusCode;
 import de.christophgockel.httpserver.filesystem.FileSystem;
 import de.christophgockel.httpserver.helper.RequestHelper;
 import de.christophgockel.httpserver.http.Request;
@@ -14,8 +16,7 @@ import java.io.IOException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.IsNot.not;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class DefaultResponderTest {
   @Rule
@@ -44,7 +45,7 @@ public class DefaultResponderTest {
   public void respondsWith200OK() throws IOException {
     Request request = RequestHelper.requestFor("GET / HTTP/1.1");
 
-    assertContains(responder.respond(request), "200 OK");
+    assertEquals(StatusCode.OK, responder.respond(request).getStatus());
   }
 
   @Test
@@ -53,8 +54,10 @@ public class DefaultResponderTest {
     documentRoot.newFile("file_2.txt");
     Request request = RequestHelper.requestFor("GET / HTTP/1.1");
 
-    assertContains(responder.respond(request), "file_1.txt");
-    assertContains(responder.respond(request), "file_2.txt");
+    Response response = responder.respond(request);
+
+    assertContains(response, "file_1.txt");
+    assertContains(response, "file_2.txt");
   }
 
   @Test
@@ -64,10 +67,11 @@ public class DefaultResponderTest {
     documentRoot.newFile("sub/file.txt");
     documentRoot.newFile("sub/another_file.txt");
     Request request = RequestHelper.requestFor("GET /sub HTTP/1.1");
+    Response response = responder.respond(request);
 
-    assertNotContains(responder.respond(request), "file_1.txt");
-    assertContains(responder.respond(request), "file.txt");
-    assertContains(responder.respond(request), "another_file.txt");
+    assertNotContains(response, "file_1.txt");
+    assertContains(response, "file.txt");
+    assertContains(response, "another_file.txt");
   }
 
   @Test
@@ -75,21 +79,21 @@ public class DefaultResponderTest {
     documentRoot.newFile("picture.jpg");
     Request request = RequestHelper.requestFor("GET /picture.jpg HTTP/1.1");
 
-    assertContains(responder.respond(request), "Content-Type: image/jpeg");
+    assertEquals("image/jpeg", responder.respond(request).getHeaders().get("Content-Type"));
   }
 
-  private void assertContains(byte[] actual, String expected) {
-    assertThat(new String(actual), containsString(expected));
+  private void assertContains(Response response, String expected) throws IOException {
+    assertThat(new String(response.getFullResponse()), containsString(expected));
   }
 
-  private void assertNotContains(byte[] actual, String expected) {
-    assertThat(new String(actual), not(containsString(expected)));
+  private void assertNotContains(Response response, String expected) throws IOException {
+    assertThat(new String(response.getFullResponse()), not(containsString(expected)));
   }
 
   @Test
-  public void returns404ForUnknownFiles() {
+  public void returns404ForUnknownFiles() throws IOException {
     Request request = RequestHelper.requestFor("GET /unknown.jpg HTTP/1.1");
 
-    assertContains(responder.respond(request), "404 Not Found");
+    assertEquals(StatusCode.NOT_FOUND, responder.respond(request).getStatus());
   }
 }

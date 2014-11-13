@@ -1,6 +1,8 @@
 package de.christophgockel.httpserver.routes.responders;
 
 import de.christophgockel.httpserver.RequestMethod;
+import de.christophgockel.httpserver.http.Response;
+import de.christophgockel.httpserver.StatusCode;
 import de.christophgockel.httpserver.http.Request;
 
 public class OptionsResponder extends BaseResponder {
@@ -10,12 +12,10 @@ public class OptionsResponder extends BaseResponder {
   }
 
   @Override
-  protected byte[] respond(Request request) {
-    String response;
+  protected Response respond(Request request) {
+    Response response = new Response(StatusCode.OK);
+    response.addHeader("Allow", "GET,HEAD,POST,OPTIONS,PUT");
 
-    response = "HTTP/1.1 200 OK\r\n";
-    response += "Allow: GET,HEAD,POST,OPTIONS,PUT\n\r\n\r\n";
-
-    return response.getBytes();
+    return response;
   }
 }

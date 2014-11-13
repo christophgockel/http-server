@@ -58,7 +58,7 @@ public class HttpServer {
             Router router = new Router(new DefaultResponder(fileSystem));
             router.add("/method_options", new OptionsResponder());
 
-            out.write(router.dispatch(request));
+            out.write(router.dispatch(request).getFullResponse());
 
             out.close();
           } catch (IOException e) {
