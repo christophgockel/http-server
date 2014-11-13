@@ -15,11 +15,7 @@ public class DefaultResponder extends BaseResponder {
 
   @Override
   protected boolean respondsTo(RequestMethod method, String path) {
-    if (method == RequestMethod.GET) {
-      return true;
-    }
-
-    return false;
+    return method == RequestMethod.GET;
   }
 
   @Override
@@ -27,7 +23,7 @@ public class DefaultResponder extends BaseResponder {
     String body = "<html><head><title>Something</title></head><body>";
 
     body += "<ul>";
-    for (File file : fileSystem.getFiles()) {
+    for (File file : fileSystem.getFiles(request.getURI())) {
       body += "<li>" + file.getName() + "</li>";
     }
     body += "</ul>";

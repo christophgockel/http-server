@@ -13,6 +13,7 @@ import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -54,5 +55,18 @@ public class DefaultResponderTest {
 
     assertThat(responder.respond(request), containsString("file_1.txt"));
     assertThat(responder.respond(request), containsString("file_2.txt"));
+  }
+
+  @Test
+  public void listsSubDirectoryContents() throws IOException {
+    documentRoot.newFile("file_1.txt");
+    documentRoot.newFolder("sub");
+    documentRoot.newFile("sub/file.txt");
+    documentRoot.newFile("sub/another_file.txt");
+    Request request = RequestHelper.requestFor("GET /sub HTTP/1.1");
+
+    assertThat(responder.respond(request), not(containsString("file_1.txt")));
+    assertThat(responder.respond(request), containsString("file.txt"));
+    assertThat(responder.respond(request), containsString("another_file.txt"));
   }
 }
