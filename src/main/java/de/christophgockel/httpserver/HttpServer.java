@@ -6,6 +6,7 @@ import de.christophgockel.httpserver.http.Response;
 import de.christophgockel.httpserver.routes.Router;
 import de.christophgockel.httpserver.routes.responders.DefaultResponder;
 import de.christophgockel.httpserver.routes.responders.OptionsResponder;
+import de.christophgockel.httpserver.routes.responders.ParametersResponder;
 import de.christophgockel.httpserver.routes.responders.PatchResponder;
 
 import java.io.DataOutputStream;
@@ -60,6 +61,7 @@ public class HttpServer {
             Router router = new Router(new DefaultResponder(fileSystem));
             router.add("/method_options", new OptionsResponder());
             router.add("/patch-content.txt", new PatchResponder(fileSystem));
+            router.add("/parameters", new ParametersResponder());
 
             out.write(router.dispatch(request).getFullResponse());
 

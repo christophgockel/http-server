@@ -2,22 +2,23 @@ package de.christophgockel.httpserver.http;
 
 import de.christophgockel.httpserver.RequestMethod;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.URLDecoder;
 import java.nio.CharBuffer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 public class Request {
   private RequestMethod method;
   private String              uri;
+  private Map<String, String> parameters;
   private Map<String, String> headers;
   private String              body;
 
   public Request(InputStream input) {
     headers = new HashMap<>();
+    parameters = new HashMap<>();
     body = "";
     parseRequest(new BufferedReader(new InputStreamReader(input)));
   }
@@ -38,6 +39,14 @@ public class Request {
     return body;
   }
 
+  public boolean hasParameters() {
+    return parameters.size() > 0;
+  }
+
+  public Map<String, String> getParameters() {
+    return parameters;
+  }
+
   private void parseRequest(BufferedReader reader) {
     try {
       parseRequestLine(reader);
@@ -55,9 +64,50 @@ public class Request {
       String[] parts = requestLine.trim().split("[ ]");
 
       method = RequestMethod.forValue(parts[0]);
-      uri = parts[1];
+      parseURI(parts[1]);
     } catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
       throw new MalformedException("Invalid request: '" + requestLine + "'", e);
+    }
+  }
+
+  private void parseURI(String uri) {
+    if (uri.contains("?")) {
+      String[] parts = uri.split("\\?");
+      this.uri = parts[0];
+      parseParameters(parts[1]);
+    } else {
+      this.uri = uri;
+    }
+  }
+
+  private void parseParameters(String queryString) {
+    Scanner definitionScanner = new Scanner(queryString);
+    definitionScanner.useDelimiter("&");
+
+    while (definitionScanner.hasNext()) {
+      String definition = definitionScanner.next();
+
+      String name;
+      String value;
+
+      if (definition.contains("=")) {
+        String[] parts = definition.split("=");
+        name = parts[0];
+        value = decode(parts[1]);
+      } else {
+        name = definition;
+        value = "";
+      }
+
+      parameters.put(name, value);
+    }
+  }
+
+  private String decode(String value) {
+    try {
+      return URLDecoder.decode(value, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      return "";
     }
   }
 

@@ -11,6 +11,7 @@ import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class RequestTest {
   @Test
@@ -101,6 +102,24 @@ public class RequestTest {
     String content = "PUT / HTTP/1.1\r\n" +
                      "Accept-Charset";
     requestFor(content);
+  }
+
+  @Test
+  public void returnsURIWithoutParameters() {
+    String content = "GET /resource?parameter=value HTTP/1.1\r\n";
+    Request request = requestFor(content);
+
+    assertEquals("/resource", request.getURI());
+  }
+
+  @Test
+  public void parsesURIParameters() {
+    String content = "GET /resource?parameter=value&other=%20%3C%2C%20 HTTP/1.1\r\n";
+    Request request = requestFor(content);
+
+    assertTrue(request.hasParameters());
+    assertEquals("value", request.getParameters().get("parameter"));
+    assertEquals(" <, ", request.getParameters().get("other"));
   }
 
   private RequestMethod methodFor(String requestLine) {
