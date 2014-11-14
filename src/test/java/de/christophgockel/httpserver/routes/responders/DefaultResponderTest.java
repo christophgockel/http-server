@@ -90,6 +90,7 @@ public class DefaultResponderTest {
     Request request = RequestHelper.requestFor("POST /unknown HTTP/1.1");
 
     assertEquals(StatusCode.NOT_ALLOWED, responder.respond(request).getStatus());
+    assertEquals(RequestMethod.GET.toString(), responder.respond(request).getHeaders().get("Allow"));
   }
 
   @Test

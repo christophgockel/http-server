@@ -27,7 +27,7 @@ public class DefaultResponder extends BaseResponder {
     if (isGetRequest(request)) {
       return serveGetRequest(request);
     } else {
-      return new Response(NOT_ALLOWED);
+      return notAllowed();
     }
   }
 
@@ -76,6 +76,12 @@ public class DefaultResponder extends BaseResponder {
     response.addHeader("Content-Type", mimeType);
     response.setBody(content);
 
+    return response;
+  }
+
+  private Response notAllowed() {
+    Response response = new Response(NOT_ALLOWED);
+    response.addHeader("Allow", GET.toString());
     return response;
   }
 }
