@@ -1,12 +1,14 @@
 package de.christophgockel.httpserver.routes.responders;
 
 import de.christophgockel.httpserver.RequestMethod;
-import de.christophgockel.httpserver.http.Response;
-import de.christophgockel.httpserver.StatusCode;
 import de.christophgockel.httpserver.filesystem.FileSystem;
 import de.christophgockel.httpserver.http.Request;
+import de.christophgockel.httpserver.http.Response;
 
 import java.io.File;
+
+import static de.christophgockel.httpserver.RequestMethod.*;
+import static de.christophgockel.httpserver.StatusCode.*;
 
 public class DefaultResponder extends BaseResponder {
   private final FileSystem fileSystem;
@@ -17,41 +19,63 @@ public class DefaultResponder extends BaseResponder {
 
   @Override
   protected boolean respondsTo(RequestMethod method, String path) {
-    return method == RequestMethod.GET;
+    return true;
   }
 
   @Override
   protected Response respond(Request request) {
-    String body = "<html><head><title>Something</title></head><body>";
+    if (isGetRequest(request)) {
+      return serveGetRequest(request);
+    } else {
+      return new Response(NOT_ALLOWED);
+    }
+  }
 
+  private boolean isGetRequest(Request request) {
+    return request.getMethod() == GET;
+  }
+
+  private Response serveGetRequest(Request request) {
     String requestedResource = request.getURI();
 
     if (fileSystem.isFile(requestedResource)) {
-      String mimeType = fileSystem.getMimeType(requestedResource);
-      byte[] content = fileSystem.getFileContent(requestedResource);
-
-      Response response = new Response(StatusCode.OK);
-      response.addHeader("Content-Type", mimeType);
-      response.setBody(content);
-
-      return response;
+      return serveFile(requestedResource);
     } else if (fileSystem.isDirectory(requestedResource)) {
-      body += "<ul>";
-
-      for (File file : fileSystem.getFiles(request.getURI())) {
-        body += "<li>" + file.getName() + "</li>";
-      }
-
-      body += "</ul>";
-      body += "</body></html>";
-
-      Response response = new Response(StatusCode.OK);
-      response.addHeader("Content-Type", "text/html");
-      response.setBody(body);
-
-      return response;
+      return serveDirectoryListing(requestedResource);
     } else {
-      return new Response(StatusCode.NOT_FOUND);
+      return new Response(NOT_FOUND);
     }
+  }
+
+  private Response serveDirectoryListing(String requestedResource) {
+    String body = "<html><head><title>" + requestedResource + "</title></head><body>";
+
+    body += "<ul>";
+
+    for (File file : fileSystem.getFiles(requestedResource)) {
+      body += "<li>";
+      body += "<a href=\"" + file.getName() + "\">" + file.getName() + "</a>";
+      body += "</li>";
+    }
+
+    body += "</ul>";
+    body += "</body></html>";
+
+    Response response = new Response(OK);
+    response.addHeader("Content-Type", "text/html");
+    response.setBody(body);
+
+    return response;
+  }
+
+  private Response serveFile(String requestedResource) {
+    String mimeType = fileSystem.getMimeType(requestedResource);
+    byte[] content = fileSystem.getFileContent(requestedResource);
+
+    Response response = new Response(OK);
+    response.addHeader("Content-Type", mimeType);
+    response.setBody(content);
+
+    return response;
   }
 }

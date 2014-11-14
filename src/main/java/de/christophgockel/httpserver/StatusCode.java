@@ -4,6 +4,7 @@ public enum StatusCode {
   OK                    (200, "OK"),
   NO_CONTENT            (204, "No Content"),
   NOT_FOUND             (404, "Not Found"),
+  NOT_ALLOWED           (405, "Not Allowed"),
   PRECONDITION_FAILED   (412, "Precondition Failed"),
   INTERNAL_SERVER_ERROR (500, "Internal Server Error"),
   NOT_IMPLEMENTED       (501, "Not Implemented");

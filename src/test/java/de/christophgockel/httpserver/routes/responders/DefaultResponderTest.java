@@ -29,16 +29,12 @@ public class DefaultResponderTest {
   }
 
   @Test
-  public void respondsToAllGetRequests() {
+  public void respondsToAllRequests() {
     assertTrue(responder.respondsTo(RequestMethod.GET, "/"));
     assertTrue(responder.respondsTo(RequestMethod.GET, "/something"));
     assertTrue(responder.respondsTo(RequestMethod.GET, "/some/other/path"));
-  }
-
-  @Test
-  public void doesNotRespondToNonGetRequest() {
-    assertFalse(responder.respondsTo(RequestMethod.POST, "/"));
-    assertFalse(responder.respondsTo(RequestMethod.PUT, "/"));
+    assertTrue(responder.respondsTo(RequestMethod.POST, "/"));
+    assertTrue(responder.respondsTo(RequestMethod.PUT, "/"));
   }
 
   @Test
@@ -82,18 +78,36 @@ public class DefaultResponderTest {
     assertEquals("image/jpeg", responder.respond(request).getHeaders().get("Content-Type"));
   }
 
+  @Test
+  public void returns404ForUnknownFiles() throws IOException {
+    Request request = RequestHelper.requestFor("GET /unknown.jpg HTTP/1.1");
+
+    assertEquals(StatusCode.NOT_FOUND, responder.respond(request).getStatus());
+  }
+
+  @Test
+  public void returns405ForNonGetRequests() {
+    Request request = RequestHelper.requestFor("POST /unknown HTTP/1.1");
+
+    assertEquals(StatusCode.NOT_ALLOWED, responder.respond(request).getStatus());
+  }
+
+  @Test
+  public void directoryListingContainsLinksToFiles() throws IOException {
+    documentRoot.newFile("file_1.txt");
+    documentRoot.newFile("file_2.txt");
+    Request request = RequestHelper.requestFor("GET / HTTP/1.1");
+    Response response = responder.respond(request);
+
+    assertContains(response, "<a href=\"file_1.txt\">file_1.txt</a>");
+    assertContains(response, "<a href=\"file_2.txt\">file_2.txt</a>");
+  }
+
   private void assertContains(Response response, String expected) throws IOException {
     assertThat(new String(response.getFullResponse()), containsString(expected));
   }
 
   private void assertNotContains(Response response, String expected) throws IOException {
     assertThat(new String(response.getFullResponse()), not(containsString(expected)));
-  }
-
-  @Test
-  public void returns404ForUnknownFiles() throws IOException {
-    Request request = RequestHelper.requestFor("GET /unknown.jpg HTTP/1.1");
-
-    assertEquals(StatusCode.NOT_FOUND, responder.respond(request).getStatus());
   }
 }
