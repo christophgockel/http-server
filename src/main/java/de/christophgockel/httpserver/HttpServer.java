@@ -49,6 +49,7 @@ public class HttpServer {
     router.add("/patch-content.txt", new PatchResponder(fileSystem));
     router.add("/parameters", new ParametersResponder());
     router.add("/form", new FormResponder(fileSystem));
+    router.add("/redirect", new RedirectResponder(5000));
 
     while (true) {
       final Socket s = socket.accept();
