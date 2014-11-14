@@ -11,9 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class FileSystemTest {
   @Rule
@@ -124,5 +122,16 @@ public class FileSystemTest {
     fw.close();
 
     assertEquals("60bb224c68b1ed765a0f84d910de58d0beea91c4", fs.getSHA1ForFile("file.txt"));
+  }
+
+  @Test
+  public void deletesFiles() throws IOException {
+    FileSystem fs = new FileSystem(documentRoot.getRoot());
+
+    File file = documentRoot.newFile("existing_file.txt");
+
+    fs.deleteFile("existing_file.txt");
+
+    assertFalse(fs.isFile("existing_file.txt"));
   }
 }

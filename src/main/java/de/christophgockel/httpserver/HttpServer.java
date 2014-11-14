@@ -4,10 +4,7 @@ import de.christophgockel.httpserver.filesystem.FileSystem;
 import de.christophgockel.httpserver.http.Request;
 import de.christophgockel.httpserver.http.Response;
 import de.christophgockel.httpserver.routes.Router;
-import de.christophgockel.httpserver.routes.responders.DefaultResponder;
-import de.christophgockel.httpserver.routes.responders.OptionsResponder;
-import de.christophgockel.httpserver.routes.responders.ParametersResponder;
-import de.christophgockel.httpserver.routes.responders.PatchResponder;
+import de.christophgockel.httpserver.routes.responders.*;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -47,6 +44,12 @@ public class HttpServer {
   public void start() throws IOException {
     isRunning = true;
 
+    final Router router = new Router(new DefaultResponder(fileSystem));
+    router.add("/method_options", new OptionsResponder());
+    router.add("/patch-content.txt", new PatchResponder(fileSystem));
+    router.add("/parameters", new ParametersResponder());
+    router.add("/form", new FormResponder(fileSystem));
+
     while (true) {
       final Socket s = socket.accept();
       Runnable r = new Runnable() {
@@ -57,11 +60,6 @@ public class HttpServer {
             out = new DataOutputStream(s.getOutputStream());
 
             Request request = new Request(s.getInputStream());
-
-            Router router = new Router(new DefaultResponder(fileSystem));
-            router.add("/method_options", new OptionsResponder());
-            router.add("/patch-content.txt", new PatchResponder(fileSystem));
-            router.add("/parameters", new ParametersResponder());
 
             out.write(router.dispatch(request).getFullResponse());
 

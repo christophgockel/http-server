@@ -80,7 +80,7 @@ public class FileSystem {
     try {
       return Files.readAllBytes(Paths.get(root.getPath() + File.separator + pathToFile));
     } catch (IOException e) {
-      return "ERR".getBytes();
+      return "".getBytes();
     }
   }
 
@@ -96,6 +96,18 @@ public class FileSystem {
 
   public String getSHA1ForFile(String pathToFile) {
     return DigestUtils.sha1Hex(getFileContent(pathToFile));
+  }
+
+  public void createNewFile(String pathToFile, String content) {
+
+  }
+
+  public void deleteFile(String pathToFile) {
+    try {
+      Files.deleteIfExists(Paths.get(root.getPath() + File.separator + pathToFile));
+    } catch (IOException e) {
+      //
+    }
   }
 
   private String relativePathFor(File file) {
