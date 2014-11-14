@@ -103,4 +103,26 @@ public class FileSystemTest {
 
     assertEquals("text/plain", fs.getMimeType("file.txt"));
   }
+
+  @Test
+  public void writesFileContents() throws IOException {
+    documentRoot.newFile("some_file.txt");
+    FileSystem fs = new FileSystem(documentRoot.getRoot());
+
+    fs.setFileContent("some_file.txt", "some new content".getBytes());
+
+    assertArrayEquals("some new content".getBytes(), fs.getFileContent("some_file.txt"));
+  }
+
+  @Test
+  public void providesSHA1HashOfAFile() throws IOException {
+    FileSystem fs = new FileSystem(documentRoot.getRoot());
+
+    File file = documentRoot.newFile("file.txt");
+    FileWriter fw = new FileWriter(file);
+    fw.write("default content\n");
+    fw.close();
+
+    assertEquals("60bb224c68b1ed765a0f84d910de58d0beea91c4", fs.getSHA1ForFile("file.txt"));
+  }
 }

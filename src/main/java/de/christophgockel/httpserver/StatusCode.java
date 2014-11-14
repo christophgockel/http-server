@@ -1,9 +1,12 @@
 package de.christophgockel.httpserver;
 
 public enum StatusCode {
-  OK(200, "OK"),
-  NOT_FOUND(404, "Not Found"),
-  NOT_IMPLEMENTED(501, "Not Implemented");
+  OK                    (200, "OK"),
+  NO_CONTENT            (204, "No Content"),
+  NOT_FOUND             (404, "Not Found"),
+  PRECONDITION_FAILED   (412, "Precondition Failed"),
+  INTERNAL_SERVER_ERROR (500, "Internal Server Error"),
+  NOT_IMPLEMENTED       (501, "Not Implemented");
 
   private int code;
   private String message;

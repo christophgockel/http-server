@@ -1,6 +1,9 @@
 package de.christophgockel.httpserver.filesystem;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -79,6 +82,20 @@ public class FileSystem {
     } catch (IOException e) {
       return "ERR".getBytes();
     }
+  }
+
+  public void setFileContent(String pathToFile, byte[] content) {
+    try {
+      FileOutputStream f = new FileOutputStream(root.getPath() + File.separator + pathToFile);
+      f.write(content);
+      f.close();
+    } catch (IOException e) {
+      throw new RuntimeException("Error writing a file.");
+    }
+  }
+
+  public String getSHA1ForFile(String pathToFile) {
+    return DigestUtils.sha1Hex(getFileContent(pathToFile));
   }
 
   private String relativePathFor(File file) {

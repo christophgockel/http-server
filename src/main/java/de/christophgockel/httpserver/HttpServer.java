@@ -2,9 +2,11 @@ package de.christophgockel.httpserver;
 
 import de.christophgockel.httpserver.filesystem.FileSystem;
 import de.christophgockel.httpserver.http.Request;
+import de.christophgockel.httpserver.http.Response;
 import de.christophgockel.httpserver.routes.Router;
 import de.christophgockel.httpserver.routes.responders.DefaultResponder;
 import de.christophgockel.httpserver.routes.responders.OptionsResponder;
+import de.christophgockel.httpserver.routes.responders.PatchResponder;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -49,20 +51,39 @@ public class HttpServer {
       Runnable r = new Runnable() {
         @Override
         public void run() {
+          DataOutputStream out = null;
           try {
-            DataOutputStream out;
             out = new DataOutputStream(s.getOutputStream());
 
             Request request = new Request(s.getInputStream());
 
             Router router = new Router(new DefaultResponder(fileSystem));
             router.add("/method_options", new OptionsResponder());
+            router.add("/patch-content.txt", new PatchResponder(fileSystem));
 
             out.write(router.dispatch(request).getFullResponse());
 
             out.close();
           } catch (IOException e) {
             throw new RuntimeException(e);
+          } catch (RequestMethod.UnknownMethod e) {
+            try {
+              if (out != null) {
+                Response response = new Response(StatusCode.INTERNAL_SERVER_ERROR);
+                response.setBody(e.getMessage());
+                out.write(response.getFullResponse());
+              }
+            } catch (IOException e1) {
+              e1.printStackTrace();
+            }
+          } finally {
+            if (out != null) {
+              try {
+                out.close();
+              } catch (IOException e) {
+                e.printStackTrace();
+              }
+            }
           }
         }
       };

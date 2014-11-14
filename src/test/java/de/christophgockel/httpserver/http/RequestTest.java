@@ -8,6 +8,8 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 
 public class RequestTest {
@@ -57,7 +59,7 @@ public class RequestTest {
                      "\r\n" +
                      "var=value";
 
-    assertEquals("var=value", requestFor(request).getBody());
+    assertThat(requestFor(request).getBody(), containsString("var=value"));
   }
 
   @Test
@@ -76,7 +78,7 @@ public class RequestTest {
     assertEquals(RequestMethod.PUT, request.getMethod());
     assertEquals("/", request.getURI());
     assertEquals(headers, request.getHeaders());
-    assertEquals("some body", request.getBody());
+    assertThat(request.getBody(), containsString("some body"));
   }
 
   @Test(expected = Request.MalformedException.class)

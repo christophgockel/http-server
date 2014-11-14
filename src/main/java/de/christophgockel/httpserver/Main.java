@@ -10,6 +10,8 @@ public class Main {
       server = new HttpServer(5000, "/Users/christoph/development/8thlight/cob_spec/public");
       server.start();
     } catch (IOException e) {
+      System.out.println(e.getMessage());
+      e.printStackTrace();
       if (server != null) {
         server.stop();
       }

@@ -96,6 +96,10 @@ public class Request {
       for (char s : buffer.array()) {
         body += s;
       }
+
+      if (!body.equals("") && !body.substring(body.length() - 1).equals("\n")) {
+        body += "\n";
+      }
     }
   }
 

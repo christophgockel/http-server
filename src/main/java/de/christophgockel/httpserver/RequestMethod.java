@@ -1,7 +1,7 @@
 package de.christophgockel.httpserver;
 
 public enum RequestMethod {
-  GET, PUT, POST, HEAD, DELETE, TRACE, CONNECT, OPTIONS;
+  GET, PUT, POST, HEAD, DELETE, TRACE, CONNECT, OPTIONS, PATCH;
 
   public static RequestMethod forValue(String value) {
     switch (value) {
@@ -21,6 +21,8 @@ public enum RequestMethod {
         return CONNECT;
       case "OPTIONS":
         return OPTIONS;
+      case "PATCH":
+        return PATCH;
       default:
         throw new UnknownMethod(value);
     }
