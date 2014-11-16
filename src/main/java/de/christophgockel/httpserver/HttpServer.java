@@ -50,6 +50,7 @@ public class HttpServer {
     router.add("/parameters", new ParametersResponder());
     router.add("/form", new FormResponder(fileSystem));
     router.add("/redirect", new RedirectResponder(5000));
+    router.add("/partial_content.txt", new PartialResponder(fileSystem));
 
     while (true) {
       final Socket s = socket.accept();
