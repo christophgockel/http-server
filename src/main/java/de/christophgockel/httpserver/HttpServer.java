@@ -51,6 +51,7 @@ public class HttpServer {
     router.add("/form", new FormResponder(fileSystem));
     router.add("/redirect", new RedirectResponder(5000));
     router.add("/partial_content.txt", new PartialResponder(fileSystem));
+    router.add("/logs", new LogResponder());
 
     while (true) {
       final Socket s = socket.accept();
@@ -62,6 +63,7 @@ public class HttpServer {
             out = new DataOutputStream(s.getOutputStream());
 
             Request request = new Request(s.getInputStream());
+            Logger.log(request);
 
             out.write(router.dispatch(request).getFullResponse());
 
