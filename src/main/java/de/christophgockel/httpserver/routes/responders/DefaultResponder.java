@@ -4,6 +4,7 @@ import de.christophgockel.httpserver.RequestMethod;
 import de.christophgockel.httpserver.filesystem.FileSystem;
 import de.christophgockel.httpserver.http.Request;
 import de.christophgockel.httpserver.http.Response;
+import de.christophgockel.httpserver.util.HtmlPage;
 
 import java.io.File;
 
@@ -48,22 +49,15 @@ public class DefaultResponder extends BaseResponder {
   }
 
   private Response serveDirectoryListing(String requestedResource) {
-    String body = "<html><head><title>" + requestedResource + "</title></head><body>";
-
-    body += "<ul>";
+    HtmlPage page = new HtmlPage(requestedResource);
 
     for (File file : fileSystem.getFiles(requestedResource)) {
-      body += "<li>";
-      body += "<a href=\"" + file.getName() + "\">" + file.getName() + "</a>";
-      body += "</li>";
+      page.addParagraph(page.createLink(file.getName(), file.getName()));
     }
-
-    body += "</ul>";
-    body += "</body></html>";
 
     Response response = new Response(OK);
     response.addHeader("Content-Type", "text/html");
-    response.setBody(body);
+    response.setBody(page.getContent());
 
     return response;
   }

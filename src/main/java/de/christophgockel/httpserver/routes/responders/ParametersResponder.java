@@ -4,9 +4,8 @@ import de.christophgockel.httpserver.RequestMethod;
 import de.christophgockel.httpserver.StatusCode;
 import de.christophgockel.httpserver.http.Request;
 import de.christophgockel.httpserver.http.Response;
+import de.christophgockel.httpserver.util.HtmlPage;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Map;
 
 public class ParametersResponder extends BaseResponder {
@@ -17,32 +16,19 @@ public class ParametersResponder extends BaseResponder {
 
   @Override
   protected Response respond(Request request) {
-    String body = "<html><head><title>Parameters</title></head><body>";
-
+    HtmlPage page = new HtmlPage("Parameters");
     Response response = new Response(StatusCode.OK);
     response.addHeader("Content-Type", "text/html");
 
-    try {
-      URI uri = new URI(request.getURI());
-      if (uri == null) {
-        response.setBody("noe");
-        return response;
+    if (request.hasParameters()) {
+      for (Map.Entry<String, String> parameter : request.getParameters().entrySet()) {
+        page.addParagraph(parameter.getKey() + " = " + parameter.getValue());
       }
-      String queryString = uri.getQuery();
-
-      if (request.hasParameters()) {
-        for (Map.Entry<String, String> parameter : request.getParameters().entrySet()) {
-          body += parameter.getKey() + " = " + parameter.getValue() + "<br/>";
-        }
-      } else {
-        body += "no parameters";
-      }
-      body += "</body></html>";
-
-      response.setBody(body);
-    } catch (URISyntaxException e) {
-      response.setBody(e.getMessage());
+    } else {
+      page.addParagraph("No Parameters");
     }
+
+    response.setBody(page.getContent());
 
     return response;
   }

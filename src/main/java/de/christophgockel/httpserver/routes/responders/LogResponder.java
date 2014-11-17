@@ -6,6 +6,7 @@ import de.christophgockel.httpserver.StatusCode;
 import de.christophgockel.httpserver.http.Request;
 import de.christophgockel.httpserver.http.Response;
 import de.christophgockel.httpserver.util.Authentication;
+import de.christophgockel.httpserver.util.HtmlPage;
 
 public class LogResponder extends BaseResponder {
   private Authentication authentication;
@@ -25,14 +26,15 @@ public class LogResponder extends BaseResponder {
   @Override
   protected Response respond(Request request) {
     Response response;
+    HtmlPage page = new HtmlPage("Log Entries");
 
     if (isAuthenticated(request)) {
       response = new Response(StatusCode.OK);
-      String content = "";
+
       for (String entry : Logger.getEntries()) {
-        content += entry + "<br/>";
+        page.addParagraph(entry);
       }
-      response.setBody(content.getBytes());
+      response.setBody(page.getContent().getBytes());
     } else {
       response = new Response(StatusCode.UNAUTHORIZED);
       response.addHeader("WWW-Authenticate", "Basic realm=\"HTTP Server\"");
