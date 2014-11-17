@@ -5,11 +5,15 @@ import de.christophgockel.httpserver.RequestMethod;
 import de.christophgockel.httpserver.StatusCode;
 import de.christophgockel.httpserver.http.Request;
 import de.christophgockel.httpserver.http.Response;
-import org.apache.commons.codec.binary.Base64;
-
-import java.nio.charset.Charset;
+import de.christophgockel.httpserver.util.Authentication;
 
 public class LogResponder extends BaseResponder {
+  private Authentication authentication;
+
+  public LogResponder() {
+    authentication = new Authentication("admin", "hunter2");
+  }
+
   @Override
   protected boolean respondsTo(RequestMethod method, String path) {
     return path.equals("/logs")
@@ -39,28 +43,17 @@ public class LogResponder extends BaseResponder {
   }
 
   private boolean isAuthenticated(Request request) {
+    String credentials = getCredentials(request);
+    return authentication.isAuthenticated(credentials);
+  }
+
+  private String getCredentials(Request request) {
     String authenticationData = request.getHeaders().get("Authorization");
 
-    if (authenticationData != null) {
-      String decodedCredentials = decodeCredentials(authenticationData);
-      String[] parts = decodedCredentials.split("\\:");
-      String username = parts[0];
-      String password = parts[1];
-
-      if (credentialsAreValid(username, password)) {
-        return true;
-      }
+    if (authenticationData == null || authenticationData.equals("")) {
+      return "";
     }
 
-    return false;
-  }
-
-  private String decodeCredentials(String authenticationData) {
-    String encodedCredentials = authenticationData.split(" ")[1];
-    return new String(Base64.decodeBase64(encodedCredentials.getBytes()), Charset.defaultCharset());
-  }
-
-  private boolean credentialsAreValid(String username, String password) {
-    return username.equals("admin") && password.equals("hunter2");
+    return authenticationData.split(" ")[1];
   }
 }
