@@ -1,5 +1,6 @@
 package de.christophgockel.httpserver;
 
+import de.christophgockel.httpserver.routes.Router;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -20,7 +21,7 @@ public class HttpServerTest {
   public void setup() throws IOException {
     port = 8084;
     documentRoot = "some/directory";
-    server = new HttpServer(port, documentRoot);
+    server = new HttpServer(port, documentRoot, new Router(null));
   }
 
   @After
