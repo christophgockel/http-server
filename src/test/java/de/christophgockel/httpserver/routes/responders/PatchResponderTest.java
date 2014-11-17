@@ -6,7 +6,6 @@ import de.christophgockel.httpserver.filesystem.FileSystem;
 import de.christophgockel.httpserver.helper.RequestHelper;
 import de.christophgockel.httpserver.http.Request;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -40,7 +39,6 @@ public class PatchResponderTest {
   }
 
   @Test
-  @Ignore
   public void patchingAResourceNeedsValidETag() throws IOException {
     File file = documentRoot.newFile("patch-content.txt");
     FileWriter fw = new FileWriter(file);
@@ -48,14 +46,14 @@ public class PatchResponderTest {
     fw.close();
 
     String content = "PATCH /patch-content.txt HTTP/1.1\r\n" +
-                     "If-Match: 736f6d6520636f6e74656e74\r\n" +
+                     "If-Match: 94e66df8cd09d410c62d9e0dc59d3a884e458e05\r\n" +
                      "Content-Length: 11\r\n" +
                      "\r\n" +
                      "new content";
     Request request = RequestHelper.requestFor(content);
 
     assertEquals(StatusCode.NO_CONTENT, responder.respond(request).getStatus());
-    assertArrayEquals("new content".getBytes(), fileSystem.getFileContent("patch-content.txt"));
+    assertArrayEquals("new content\n".getBytes(), fileSystem.getFileContent("patch-content.txt"));
   }
 
   @Test
