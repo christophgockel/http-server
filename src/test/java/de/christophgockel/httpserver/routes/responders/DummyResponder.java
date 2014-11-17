@@ -7,7 +7,7 @@ import de.christophgockel.httpserver.http.Request;
 public class DummyResponder extends BaseResponder {
   @Override
   protected boolean respondsTo(RequestMethod method, String path) {
-    return true;
+    return false;
   }
 
   @Override
