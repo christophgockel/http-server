@@ -3,20 +3,20 @@ package de.christophgockel.httpserver;
 import de.christophgockel.httpserver.filesystem.FileSystem;
 import de.christophgockel.httpserver.routes.Router;
 import de.christophgockel.httpserver.routes.responders.*;
+import de.christophgockel.httpserver.util.Arguments;
 
 import java.io.IOException;
 
 public class Main {
   public static void main(String[] args) throws IOException {
     HttpServer server = null;
+    Arguments arguments = new Arguments(args);
+    FileSystem fileSystem = new FileSystem(arguments.getDocumentRoot());
 
-    FileSystem fileSystem = new FileSystem("/Users/christoph/development/8thlight/cob_spec/public");
-
-    final Router router = createRouter(fileSystem, 5000);
-
+    final Router router = createRouter(fileSystem, arguments.getPort());
 
     try {
-      server = new HttpServer(5000, "/Users/christoph/development/8thlight/cob_spec/public", router);
+      server = new HttpServer(arguments.getPort(), arguments.getDocumentRoot(), router);
       server.start();
     } catch (IOException e) {
       System.out.println(e.getMessage());
