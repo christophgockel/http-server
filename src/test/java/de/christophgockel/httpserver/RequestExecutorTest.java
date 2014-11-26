@@ -1,7 +1,7 @@
 package de.christophgockel.httpserver;
 
 import de.christophgockel.httpserver.routes.Router;
-import de.christophgockel.httpserver.routes.responders.DummyResponder;
+import de.christophgockel.httpserver.routes.responders.NonRespondingResponder;
 import org.junit.Test;
 
 import java.io.*;
@@ -24,7 +24,7 @@ public class RequestExecutorTest {
     when(mockedSocket.getInputStream()).thenReturn(inputStream);
     when(mockedSocket.getOutputStream()).thenReturn(outputStream);
 
-    executor = new RequestExecutor(mockedSocket, new Router(new DummyResponder()));
+    executor = new RequestExecutor(mockedSocket, new Router(new NonRespondingResponder()));
   }
 
   @Test
