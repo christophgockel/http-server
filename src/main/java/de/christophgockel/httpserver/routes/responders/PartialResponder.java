@@ -1,12 +1,13 @@
 package de.christophgockel.httpserver.routes.responders;
 
 import de.christophgockel.httpserver.RequestMethod;
-import de.christophgockel.httpserver.StatusCode;
 import de.christophgockel.httpserver.filesystem.FileSystem;
 import de.christophgockel.httpserver.http.Request;
 import de.christophgockel.httpserver.http.Response;
 
 import java.util.Arrays;
+
+import static de.christophgockel.httpserver.StatusCode.PARTIAL_CONTENT;
 
 public class PartialResponder extends BaseResponder {
   private final FileSystem fileSystem;
@@ -25,25 +26,46 @@ public class PartialResponder extends BaseResponder {
     DefaultResponder responder = new DefaultResponder(fileSystem);
     Response response = responder.respond(request);
 
-    return partialResponse(request, response);
+    String headerContent = request.getHeaders().get("Range");
+
+    if (headerContent != null) {
+      return partialResponse(headerContent, response);
+    }
+
+    return response;
   }
 
-  private Response partialResponse(Request request, Response response) {
-    String headerData = request.getHeaders().get("Range");
-    Response partialResponse = response;
+  private Response partialResponse(String rangeHeader, Response originalResponse) {
+      byte[] originalBody = originalResponse.getBody();
 
-    if (headerData != null) {
-      partialResponse = new Response(StatusCode.PARTIAL_CONTENT);
-      byte[] originalBody = response.getBody();
-      String range = headerData.split("=")[1];
-      String[] byteRange = range.split("\\-");
-      int rangeStart = Integer.parseInt(byteRange[0]);
-      int rangeEnd   = Integer.parseInt(byteRange[1]);
+      String rangeDefinition = getRangeDefinition(rangeHeader);
 
-      byte[] newBody = Arrays.copyOfRange(originalBody, rangeStart, rangeEnd + 1);
+      if (rangeCanBeSplit(rangeDefinition)) {
+        String[] byteRanges = rangeDefinition.split("\\-");
 
-      partialResponse.setBody(newBody);
-    }
-    return partialResponse;
+        int rangeStart = Integer.parseInt(byteRanges[0]);
+        int rangeEnd = Integer.parseInt(byteRanges[1]);
+
+        byte[] body = Arrays.copyOfRange(originalBody, rangeStart, rangeEnd + 1);
+
+        return partialResponseWith(body);
+      }
+
+    return originalResponse;
+  }
+
+  private Response partialResponseWith(byte[] body) {
+    Response response = new Response(PARTIAL_CONTENT);
+    response.setBody(body);
+
+    return response;
+  }
+
+  private boolean rangeCanBeSplit(String rangeDefinition) {
+    return rangeDefinition.contains("-");
+  }
+
+  private String getRangeDefinition(String header) {
+    return header.split("=")[1];
   }
 }
