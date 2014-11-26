@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 public class FormResponderTest {
   @Rule
   public TemporaryFolder documentRoot = new TemporaryFolder();
-  private BaseResponder responder;
+  private FormResponder responder;
   private FileSystem fileSystem;
 
   @Before

@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
 public class PatchResponderTest {
   @Rule
   public TemporaryFolder documentRoot = new TemporaryFolder();
-  private BaseResponder responder;
+  private PatchResponder responder;
   private FileSystem fileSystem;
 
   @Before

@@ -12,7 +12,7 @@ import java.io.IOException;
 import static org.junit.Assert.*;
 
 public class OptionsResponderTest {
-  private BaseResponder responder;
+  private OptionsResponder responder;
 
   @Before
   public void setup() {

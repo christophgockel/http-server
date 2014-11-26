@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
 public class PartialResponderTest {
   @Rule
   public TemporaryFolder documentRoot = new TemporaryFolder();
-  private BaseResponder responder;
+  private PartialResponder responder;
   private FileSystem fileSystem;
 
   @Before

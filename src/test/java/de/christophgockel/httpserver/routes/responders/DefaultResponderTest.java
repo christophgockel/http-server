@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 public class DefaultResponderTest {
   @Rule
   public TemporaryFolder documentRoot = new TemporaryFolder();
-  private BaseResponder responder;
+  private DefaultResponder responder;
 
   @Before
   public void setup() throws IOException {
