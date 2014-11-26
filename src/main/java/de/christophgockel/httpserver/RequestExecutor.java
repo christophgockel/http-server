@@ -1,19 +1,19 @@
 package de.christophgockel.httpserver;
 
+import de.christophgockel.httpserver.http.ClientSocket;
 import de.christophgockel.httpserver.http.Request;
 import de.christophgockel.httpserver.http.Response;
 import de.christophgockel.httpserver.routes.Router;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 
 public class RequestExecutor implements Runnable {
-  private final Socket socket;
+  private final ClientSocket socket;
   private final Router router;
   private DataOutputStream out;
 
-  public RequestExecutor(Socket socket, Router router) {
+  public RequestExecutor(ClientSocket socket, Router router) {
     this.socket = socket;
     this.router = router;
   }

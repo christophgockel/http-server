@@ -1,10 +1,11 @@
 package de.christophgockel.httpserver;
 
+import de.christophgockel.httpserver.http.ClientSocket;
+import de.christophgockel.httpserver.http.DefaultClientSocket;
 import de.christophgockel.httpserver.routes.Router;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -40,8 +41,8 @@ public class HttpServer {
     isRunning = true;
 
     while (true) {
-      final Socket clientSocket = socket.accept();
-      RequestExecutor request = new RequestExecutor(clientSocket, router);
+      final ClientSocket cs = new DefaultClientSocket(socket.accept());
+      RequestExecutor request = new RequestExecutor(cs, router);
       threadPool.execute(request);
     }
   }
