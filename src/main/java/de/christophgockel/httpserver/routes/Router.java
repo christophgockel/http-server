@@ -1,6 +1,5 @@
 package de.christophgockel.httpserver.routes;
 
-import de.christophgockel.httpserver.StatusCode;
 import de.christophgockel.httpserver.http.Request;
 import de.christophgockel.httpserver.http.Response;
 import de.christophgockel.httpserver.routes.responders.BaseResponder;
@@ -26,18 +25,20 @@ public class Router {
   }
 
   public Response dispatch(Request request) {
-    BaseResponder responder = routes.get(request.getURI());
-
-    if (responder == null) {
+    if (unableToDispatch(request)) {
       return defaultResponder.handle(request);
     }
 
-    Response response = responder.handle(request);
+    BaseResponder responder = getResponderForRequest(request);
 
-    if (response.getStatus() == StatusCode.NOT_IMPLEMENTED) {
-      return defaultResponder.handle(request);
-    }
+    return responder.handle(request);
+  }
 
-    return response;
+  private boolean unableToDispatch(Request request) {
+    return !routes.containsKey(request.getURI());
+  }
+
+  private BaseResponder getResponderForRequest(Request request) {
+    return routes.get(request.getURI());
   }
 }
