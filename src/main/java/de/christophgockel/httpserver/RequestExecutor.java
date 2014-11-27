@@ -2,6 +2,7 @@ package de.christophgockel.httpserver;
 
 import de.christophgockel.httpserver.http.ClientSocket;
 import de.christophgockel.httpserver.http.Request;
+import de.christophgockel.httpserver.http.RequestParser;
 import de.christophgockel.httpserver.http.Response;
 import de.christophgockel.httpserver.routes.Router;
 
@@ -23,7 +24,8 @@ public class RequestExecutor implements Runnable {
     try {
       out = new DataOutputStream(socket.getOutputStream());
 
-      Request request = new Request(socket.getInputStream());
+      RequestParser parser = new RequestParser();
+      Request request = parser.parse(socket.getInputStream());
       Logger.log(request);
 
       out.write(router.dispatch(request).getFullResponse());

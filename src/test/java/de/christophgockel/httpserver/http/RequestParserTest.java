@@ -2,7 +2,6 @@ package de.christophgockel.httpserver.http;
 
 import de.christophgockel.httpserver.RequestMethod;
 import de.christophgockel.httpserver.helper.RequestHelper;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -13,10 +12,10 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class RequestTest {
+public class RequestParserTest {
   @Test
-  public void knowsTheDifferentRequestMethods() {
-    Assert.assertEquals(RequestMethod.GET, methodFor("GET / HTTP/1.1"));
+  public void parsesDifferentRequestMethods() {
+    assertEquals(RequestMethod.GET, methodFor("GET / HTTP/1.1"));
     assertEquals(RequestMethod.POST, methodFor("POST / HTTP/1.1"));
     assertEquals(RequestMethod.HEAD, methodFor("HEAD / HTTP/1.1"));
     assertEquals(RequestMethod.DELETE, methodFor("DELETE / HTTP/1.1"));
@@ -26,7 +25,7 @@ public class RequestTest {
   }
 
   @Test
-  public void providesURIInformations() {
+  public void parsesRequestURIs() {
     assertEquals("/some/long/path", uriFor("GET /some/long/path HTTP/1.1"));
     assertEquals("https://www.google.de", uriFor("GET https://www.google.de HTTP/1.1"));
     assertEquals("*", uriFor("OPTIONS * HTTP/1.1"));
@@ -82,7 +81,7 @@ public class RequestTest {
     assertThat(request.getBody(), containsString("some body"));
   }
 
-  @Test(expected = Request.MalformedException.class)
+  @Test(expected = RequestParser.MalformedException.class)
   public void throwsExceptionOnMalformedRequest() {
     requestFor("");
   }
@@ -92,12 +91,12 @@ public class RequestTest {
     methodFor("SOMETHING / HTTP/1.1");
   }
 
-  @Test(expected = Request.MalformedException.class)
+  @Test(expected = RequestParser.MalformedException.class)
   public void throwsExceptionOnMalformedRequestLine() {
     requestFor("GET");
   }
 
-  @Test(expected = Request.MalformedException.class)
+  @Test(expected = RequestParser.MalformedException.class)
   public void throwExceptionForMalformedHeaders() {
     String content = "PUT / HTTP/1.1\r\n" +
                      "Accept-Charset";
