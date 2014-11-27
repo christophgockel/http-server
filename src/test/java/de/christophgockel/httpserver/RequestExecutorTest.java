@@ -43,4 +43,33 @@ public class RequestExecutorTest {
     executor.run();
     assertEquals("GET /something HTTP/1.1", Logger.getEntries().get(0));
   }
+
+  @Test(expected = RuntimeException.class)
+  public void throwsRuntimeErrorWhenCatchHandlerCannotDealWithFailuresAnymore() {
+    ThrowingClientSocket socket = new ThrowingClientSocket();
+    executor = new RequestExecutor(socket, new Router(new NonRespondingResponder()));
+    executor.run();
+  }
+
+  private class ThrowingClientSocket extends StubSocket {
+    public ThrowingClientSocket() {
+      super("");
+    }
+
+    @Override
+    public OutputStream getOutputStream() throws IOException {
+      return new ThrowingOutputStream();
+    }
+
+    @Override
+    public void close() throws IOException {
+    }
+  }
+
+  private class ThrowingOutputStream extends OutputStream {
+    @Override
+    public void write(int b) throws IOException {
+      throw new IOException();
+    }
+  }
 }

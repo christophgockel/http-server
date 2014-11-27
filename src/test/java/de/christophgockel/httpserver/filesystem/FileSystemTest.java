@@ -1,6 +1,5 @@
 package de.christophgockel.httpserver.filesystem;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -17,8 +16,12 @@ public class FileSystemTest {
   @Rule
   public TemporaryFolder documentRoot = new TemporaryFolder();
 
-  @Before
-  public void setup() {
+  @Test
+  public void canBeInitializedWithAPath() throws IOException {
+    documentRoot.newFile("some_file.txt");
+    FileSystem fs = new FileSystem(documentRoot.getRoot().getAbsolutePath());
+
+    assertTrue(fs.isFile("some_file.txt"));
   }
 
   @Test
@@ -128,7 +131,7 @@ public class FileSystemTest {
   public void deletesFiles() throws IOException {
     FileSystem fs = new FileSystem(documentRoot.getRoot());
 
-    File file = documentRoot.newFile("existing_file.txt");
+    documentRoot.newFile("existing_file.txt");
 
     fs.deleteFile("existing_file.txt");
 

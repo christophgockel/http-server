@@ -50,6 +50,14 @@ public class ParametersResponderTest {
     assertContains(response, "var2 = val2");
   }
 
+  @Test
+  public void displaysMessageWhenNoParametersGiven() throws IOException {
+    String content = "GET /parameters HTTP/1.1\r\n";
+    Response response = responder.respond(RequestHelper.requestFor(content));
+
+    assertContains(response, "No Parameters");
+  }
+
   private void assertContains(Response response, String expected) throws IOException {
     assertThat(new String(response.getFullResponse()), containsString(expected));
   }

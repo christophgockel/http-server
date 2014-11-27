@@ -25,13 +25,11 @@ public class Main {
     } catch (IOException e) {
       System.out.println(e.getMessage());
       e.printStackTrace();
-      if (server != null) {
-        server.stop();
-      }
+      ensureServerIsStopped(server);
     }
   }
 
-  private static Router createRouter(FileSystem fileSystem, int port) {
+  static Router createRouter(FileSystem fileSystem, int port) {
     Router router = new Router(new DefaultResponder(fileSystem));
 
     router.add("/method_options",      new OptionsResponder());
@@ -43,5 +41,11 @@ public class Main {
     router.add("/logs",                new LogResponder());
 
     return router;
+  }
+
+  static void ensureServerIsStopped(HttpServer server) throws IOException {
+    if (server != null) {
+      server.stop();
+    }
   }
 }

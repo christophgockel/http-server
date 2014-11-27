@@ -80,4 +80,24 @@ public class PatchResponderTest {
     assertEquals(StatusCode.OK, response.getStatus());
     assertArrayEquals("the content".getBytes(), response.getBody());
   }
+
+  @Test
+  public void returnsFourOhFourWhenResourceNotFound() {
+    String content = "PATCH /unknown_file.txt HTTP/1.1\r\n";
+    Request request = RequestHelper.requestFor(content);
+
+    assertEquals(StatusCode.NOT_FOUND, responder.respond(request).getStatus());
+  }
+
+  @Test
+  public void returnsPreconditionFailedWhenNoHashGiven() throws IOException {
+    documentRoot.newFile("patch-content.txt");
+    String content = "PATCH /patch-content.txt HTTP/1.1\r\n" +
+      "Content-Length: 11\r\n" +
+      "\r\n" +
+      "new content";
+    Request request = RequestHelper.requestFor(content);
+
+    assertEquals(StatusCode.PRECONDITION_FAILED, responder.respond(request).getStatus());
+  }
 }
