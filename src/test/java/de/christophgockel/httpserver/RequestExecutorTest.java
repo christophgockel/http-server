@@ -38,6 +38,7 @@ public class RequestExecutorTest {
 
   @Test
   public void logsEveryRequest() throws IOException {
+    Logger.clear();
     prepareExecutorFor("GET /something HTTP/1.1");
     executor.run();
     assertEquals("GET /something HTTP/1.1", Logger.getEntries().get(0));

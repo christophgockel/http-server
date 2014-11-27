@@ -1,11 +1,14 @@
 package de.christophgockel.httpserver;
 
 import de.christophgockel.httpserver.filesystem.FileSystem;
+import de.christophgockel.httpserver.http.DefaultServerSocket;
+import de.christophgockel.httpserver.http.ServerSocket;
 import de.christophgockel.httpserver.routes.Router;
 import de.christophgockel.httpserver.routes.responders.*;
 import de.christophgockel.httpserver.util.Arguments;
 
 import java.io.IOException;
+import java.util.concurrent.Executors;
 
 public class Main {
   public static void main(String[] args) throws IOException {
@@ -16,7 +19,8 @@ public class Main {
     final Router router = createRouter(fileSystem, arguments.getPort());
 
     try {
-      server = new HttpServer(arguments.getPort(), arguments.getDocumentRoot(), router);
+      ServerSocket socket = new DefaultServerSocket(new java.net.ServerSocket(arguments.getPort()));
+      server = new HttpServer(socket, Executors.newFixedThreadPool(5), router);
       server.start();
     } catch (IOException e) {
       System.out.println(e.getMessage());

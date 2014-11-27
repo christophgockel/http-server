@@ -24,4 +24,8 @@ public class StubSocket implements ClientSocket {
   @Override
   public void close() throws IOException {
   }
+
+  public String getContent() {
+    return outputStream.toString();
+  }
 }

@@ -1,58 +1,38 @@
 package de.christophgockel.httpserver;
 
+import de.christophgockel.httpserver.helper.SingleThreadedExecutor;
+import de.christophgockel.httpserver.http.StubServerSocket;
 import de.christophgockel.httpserver.routes.Router;
-import org.junit.After;
+import de.christophgockel.httpserver.routes.responders.NonRespondingResponder;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.net.Socket;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
-@Ignore
 public class HttpServerTest {
   private HttpServer server;
-  private int port;
-  private String documentRoot;
+  private StubServerSocket socket;
+  private SingleThreadedExecutor executor;
 
   @Before
   public void setup() throws IOException {
-    port = 8084;
-    documentRoot = "some/directory";
-    server = new HttpServer(port, documentRoot, new Router(null));
-  }
-
-  @After
-  public void teardown() throws IOException {
-    if (server.isRunning()) {
-      server.stop();
-    }
+    socket = new StubServerSocket("GET / HTTP/1.1");
+    executor = new SingleThreadedExecutor();
+    server = new HttpServer(socket, executor, new Router(new NonRespondingResponder()));
   }
 
   @Test
-  public void hasPortAndRootDirectory() {
-    assertEquals(port, server.getPort());
-    assertEquals(documentRoot, server.getDocumentRoot());
-  }
-
-  @Test
-  public void canBeStarted() throws IOException {
-    connectClient();
+  public void executesRequests() throws IOException {
     server.start();
-    assertTrue(server.isRunning());
+    assertTrue(executor.hasExecuted());
   }
 
   @Test
-  public void canBeStopped() throws IOException {
-    connectClient();
+  public void closesTheSocketWhenStopped() throws IOException {
     server.start();
     server.stop();
-    assertFalse(server.isRunning());
-  }
-
-  private void connectClient() throws IOException {
-    Socket client = new Socket("localhost", port);
+    assertTrue(socket.isClosed());
   }
 }
