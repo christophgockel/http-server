@@ -1,10 +1,11 @@
 package de.christophgockel.httpserver;
 
+import de.christophgockel.httpserver.controllers.Controller;
 import de.christophgockel.httpserver.http.ClientSocket;
 import de.christophgockel.httpserver.http.Request;
 import de.christophgockel.httpserver.http.RequestParser;
 import de.christophgockel.httpserver.http.Response;
-import de.christophgockel.httpserver.routes.Router;
+import de.christophgockel.httpserver.routing.Router;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -28,7 +29,8 @@ public class RequestExecutor implements Runnable {
       Request request = parser.parse(socket.getInputStream());
       Logger.log(request);
 
-      out.write(router.dispatch(request).getFullResponse());
+      Controller controller = router.getController(request.getURI());
+      out.write(controller.dispatch(request).getFullResponse());
 
       out.close();
       socket.close();

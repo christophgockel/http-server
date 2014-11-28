@@ -2,8 +2,8 @@ package de.christophgockel.httpserver;
 
 import de.christophgockel.httpserver.helper.SingleThreadedExecutor;
 import de.christophgockel.httpserver.http.StubServerSocket;
-import de.christophgockel.httpserver.routes.Router;
-import de.christophgockel.httpserver.routes.responders.NonRespondingResponder;
+import de.christophgockel.httpserver.routing.Router;
+import de.christophgockel.httpserver.controllers.DummyController;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,7 +20,7 @@ public class HttpServerTest {
   public void setup() throws IOException {
     socket = new StubServerSocket("GET / HTTP/1.1");
     executor = new SingleThreadedExecutor();
-    server = new HttpServer(socket, executor, new Router(new NonRespondingResponder()));
+    server = new HttpServer(socket, executor, new Router(new DummyController()));
   }
 
   @Test

@@ -2,7 +2,7 @@ package de.christophgockel.httpserver;
 
 import de.christophgockel.httpserver.http.ClientSocket;
 import de.christophgockel.httpserver.http.ServerSocket;
-import de.christophgockel.httpserver.routes.Router;
+import de.christophgockel.httpserver.routing.Router;
 
 import java.io.IOException;
 import java.util.concurrent.Executor;

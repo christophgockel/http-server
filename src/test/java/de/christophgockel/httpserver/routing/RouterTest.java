@@ -1,6 +1,7 @@
 package de.christophgockel.httpserver.routing;
 
 import de.christophgockel.httpserver.controllers.Controller;
+import de.christophgockel.httpserver.controllers.DummyController;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,8 +33,5 @@ public class RouterTest {
     Controller foundController = router.getController("/path");
 
     assertThat(foundController, is(defaultController));
-  }
-
-  private class DummyController extends Controller {
   }
 }

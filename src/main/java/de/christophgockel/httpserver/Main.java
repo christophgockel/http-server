@@ -3,8 +3,8 @@ package de.christophgockel.httpserver;
 import de.christophgockel.httpserver.filesystem.FileSystem;
 import de.christophgockel.httpserver.http.DefaultServerSocket;
 import de.christophgockel.httpserver.http.ServerSocket;
-import de.christophgockel.httpserver.routes.Router;
-import de.christophgockel.httpserver.routes.responders.*;
+import de.christophgockel.httpserver.routing.Router;
+import de.christophgockel.httpserver.controllers.*;
 import de.christophgockel.httpserver.util.Arguments;
 
 import java.io.IOException;
@@ -30,15 +30,15 @@ public class Main {
   }
 
   static Router createRouter(FileSystem fileSystem, int port) {
-    Router router = new Router(new DefaultResponder(fileSystem));
+    Router router = new Router(new DefaultController(fileSystem));
 
-    router.add("/method_options",      new OptionsResponder());
-    router.add("/patch-content.txt",   new PatchResponder(fileSystem));
-    router.add("/parameters",          new ParametersResponder());
-    router.add("/form",                new FormResponder(fileSystem));
-    router.add("/redirect",            new RedirectResponder(port));
-    router.add("/partial_content.txt", new PartialResponder(fileSystem));
-    router.add("/logs",                new LogResponder());
+    router.addRoute("/method_options",      new OptionsController());
+    router.addRoute("/patch-content.txt",   new PatchController(fileSystem));
+    router.addRoute("/parameters",          new ParametersController());
+    router.addRoute("/form",                new FormController(fileSystem));
+    router.addRoute("/redirect",            new RedirectController(port));
+    router.addRoute("/partial_content.txt", new PartialController(fileSystem));
+    router.addRoute("/logs",                new LogController());
 
     return router;
   }

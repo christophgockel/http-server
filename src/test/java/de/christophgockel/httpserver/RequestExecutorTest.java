@@ -1,8 +1,8 @@
 package de.christophgockel.httpserver;
 
 import de.christophgockel.httpserver.http.StubSocket;
-import de.christophgockel.httpserver.routes.Router;
-import de.christophgockel.httpserver.routes.responders.NonRespondingResponder;
+import de.christophgockel.httpserver.routing.Router;
+import de.christophgockel.httpserver.controllers.DummyController;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -19,7 +19,7 @@ public class RequestExecutorTest {
   public void prepareExecutorFor(String request) throws IOException {
     StubSocket socket = new StubSocket(request);
     outputStream = socket.getOutputStream();
-    executor = new RequestExecutor(socket, new Router(new NonRespondingResponder()));
+    executor = new RequestExecutor(socket, new Router(new DummyController()));
   }
 
   @Test
@@ -30,10 +30,10 @@ public class RequestExecutorTest {
   }
 
   @Test
-  public void unknownResourcesResultInNotImplemented() throws IOException {
+  public void unknownResourcesResultInNotAllowed() throws IOException {
     prepareExecutorFor("GET /unknown HTTP/1.1");
     executor.run();
-    assertThat(outputStream.toString(), containsString("Not Implemented"));
+    assertThat(outputStream.toString(), containsString("Not Allowed"));
   }
 
   @Test
@@ -47,7 +47,7 @@ public class RequestExecutorTest {
   @Test(expected = RuntimeException.class)
   public void throwsRuntimeErrorWhenCatchHandlerCannotDealWithFailuresAnymore() {
     ThrowingClientSocket socket = new ThrowingClientSocket();
-    executor = new RequestExecutor(socket, new Router(new NonRespondingResponder()));
+    executor = new RequestExecutor(socket, new Router(new DummyController()));
     executor.run();
   }
 
