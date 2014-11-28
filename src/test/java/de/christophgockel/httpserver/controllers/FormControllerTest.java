@@ -44,12 +44,27 @@ public class FormControllerTest {
     assertEquals(StatusCode.OK, response.getStatus());
     assertTrue(fileSystem.isFile("form_data.txt"));
   }
+
+  @Test
+  public void writesPutDataToFile() {
+    String content = "PUT /form HTTP/1.1\r\n" +
+                     "Content-Length: 11\r\n" +
+                     "\r\n" +
+                     "put content\n";
+    Request request = RequestHelper.requestFor(content);
+
+    Response response = controller.dispatch(request);
+
+    assertEquals(StatusCode.OK, response.getStatus());
+    assertArrayEquals("put content\n".getBytes(), fileSystem.getFileContent("form_data.txt"));
+  }
+
   @Test
   public void getRequestReturnsContentFromPreviousPost() {
     String content = "POST /form HTTP/1.1\r\n" +
-      "Content-Length: 11\r\n" +
-      "\r\n" +
-      "the content";
+                     "Content-Length: 11\r\n" +
+                     "\r\n" +
+                     "the content";
     Request request = RequestHelper.requestFor(content);
     controller.dispatch(request);
 
@@ -62,9 +77,9 @@ public class FormControllerTest {
   @Test
   public void deletesStoredContent() {
     String content = "POST /form HTTP/1.1\r\n" +
-      "Content-Length: 11\r\n" +
-      "\r\n" +
-      "the content";
+                     "Content-Length: 11\r\n" +
+                     "\r\n" +
+                     "the content";
     Request request = RequestHelper.requestFor(content);
     controller.dispatch(request);
 

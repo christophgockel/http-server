@@ -22,12 +22,12 @@ public class FormController extends Controller {
 
   @Override
   protected Response post(Request request) {
-    Response response = new Response(StatusCode.OK);
-    byte[] content = request.getBody().getBytes();
+    return responseAfterWritingFile(request);
+  }
 
-    fileSystem.setFileContent(DATA_FILE, content);
-
-    return response;
+  @Override
+  protected Response put(Request request) {
+    return responseAfterWritingFile(request);
   }
 
   @Override
@@ -35,5 +35,19 @@ public class FormController extends Controller {
     Response response = new Response(StatusCode.OK);
     fileSystem.deleteFile(DATA_FILE);
     return response;
+  }
+
+  private Response responseAfterWritingFile(Request request) {
+    Response response = new Response(StatusCode.OK);
+
+    writeFileContent(request);
+
+    return response;
+  }
+
+  private void writeFileContent(Request request) {
+    byte[] content = request.getBody().getBytes();
+
+    fileSystem.setFileContent(DATA_FILE, content);
   }
 }
