@@ -1,5 +1,6 @@
 package de.christophgockel.httpserver;
 
+import de.christophgockel.httpserver.filtering.FilterChain;
 import de.christophgockel.httpserver.helper.SingleThreadedExecutor;
 import de.christophgockel.httpserver.http.StubServerSocket;
 import de.christophgockel.httpserver.routing.Router;
@@ -20,7 +21,7 @@ public class HttpServerTest {
   public void setup() throws IOException {
     socket = new StubServerSocket("GET / HTTP/1.1");
     executor = new SingleThreadedExecutor();
-    server = new HttpServer(socket, executor, new Router(new DummyController()));
+    server = new HttpServer(socket, executor, new Router(new DummyController()), new FilterChain());
   }
 
   @Test

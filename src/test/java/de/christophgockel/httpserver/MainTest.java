@@ -1,6 +1,7 @@
 package de.christophgockel.httpserver;
 
 import de.christophgockel.httpserver.controllers.DummyController;
+import de.christophgockel.httpserver.filtering.FilterChain;
 import de.christophgockel.httpserver.helper.SingleThreadedExecutor;
 import de.christophgockel.httpserver.http.StubServerSocket;
 import de.christophgockel.httpserver.routing.Router;
@@ -28,7 +29,7 @@ public class MainTest {
   @Test
   public void ensureServerIsStopped() throws IOException {
     StubServerSocket socket = new StubServerSocket("GET / HTTP/1.1");
-    HttpServer server = new HttpServer(socket, new SingleThreadedExecutor(), new Router(new DummyController()));
+    HttpServer server = new HttpServer(socket, new SingleThreadedExecutor(), new Router(new DummyController()), new FilterChain());
     server.start();
 
     Main.ensureServerIsStopped(server);

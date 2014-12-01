@@ -1,10 +1,13 @@
 package de.christophgockel.httpserver;
 
+import de.christophgockel.httpserver.controllers.*;
 import de.christophgockel.httpserver.filesystem.FileSystem;
+import de.christophgockel.httpserver.filtering.FilterChain;
+import de.christophgockel.httpserver.filtering.filters.AuthenticationFilter;
+import de.christophgockel.httpserver.filtering.filters.LoggingFilter;
 import de.christophgockel.httpserver.http.DefaultServerSocket;
 import de.christophgockel.httpserver.http.ServerSocket;
 import de.christophgockel.httpserver.routing.Router;
-import de.christophgockel.httpserver.controllers.*;
 import de.christophgockel.httpserver.util.Arguments;
 
 import java.io.IOException;
@@ -17,16 +20,26 @@ public class Main {
     FileSystem fileSystem = new FileSystem(arguments.getDocumentRoot());
 
     final Router router = createRouter(fileSystem, arguments.getPort());
+    final FilterChain filters = createFilterChain();
 
     try {
       ServerSocket socket = new DefaultServerSocket(new java.net.ServerSocket(arguments.getPort()));
-      server = new HttpServer(socket, Executors.newFixedThreadPool(5), router);
+      server = new HttpServer(socket, Executors.newFixedThreadPool(5), router, filters);
       server.start();
     } catch (IOException e) {
       System.out.println(e.getMessage());
       e.printStackTrace();
       ensureServerIsStopped(server);
     }
+  }
+
+  static FilterChain createFilterChain() {
+    FilterChain chain = new FilterChain();
+
+    chain.addFilter(new LoggingFilter());
+    chain.addFilter("/logs", new AuthenticationFilter("admin", "hunter2"));
+
+    return chain;
   }
 
   static Router createRouter(FileSystem fileSystem, int port) {

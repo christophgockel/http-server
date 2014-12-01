@@ -36,5 +36,4 @@ public class Authentication {
   private boolean credentialsAreValid(String username, String password) {
     return username.equals(this.username) && password.equals(this.password);
   }
-
 }
