@@ -8,7 +8,7 @@ public abstract class Filter {
 
   public abstract boolean filter(Request request);
 
-  public Response getRejectionResponse() {
+  final public Response getRejectionResponse() {
     return rejectingResponse;
   }
 }

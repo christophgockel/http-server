@@ -18,17 +18,16 @@ public class AuthenticationFilter extends Filter {
       return true;
     }
 
+    prepareRejectionResponse();
+
     return false;
   }
 
-  @Override
-  public Response getRejectionResponse() {
-    Response response = new Response(StatusCode.UNAUTHORIZED);
+  public void prepareRejectionResponse() {
+    rejectingResponse = new Response(StatusCode.UNAUTHORIZED);
 
-    response.addHeader("WWW-Authenticate", "Basic realm=\"HTTP Server\"");
-    response.setBody("Authentication required\n".getBytes());
-
-    return response;
+    rejectingResponse.addHeader("WWW-Authenticate", "Basic realm=\"HTTP Server\"");
+    rejectingResponse.setBody("Authentication required\n".getBytes());
   }
 
   private boolean isAuthenticated(Request request) {

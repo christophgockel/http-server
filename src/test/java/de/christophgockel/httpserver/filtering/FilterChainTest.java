@@ -79,14 +79,13 @@ public class FilterChainTest {
   }
 
   private class InvalidatingFilter extends Filter {
-    @Override
-    public boolean filter(Request request) {
-      return false;
+    public InvalidatingFilter() {
+      rejectingResponse = new Response(NOT_ALLOWED);
     }
 
     @Override
-    public Response getRejectionResponse() {
-      return new Response(NOT_ALLOWED);
+    public boolean filter(Request request) {
+      return false;
     }
   }
 
