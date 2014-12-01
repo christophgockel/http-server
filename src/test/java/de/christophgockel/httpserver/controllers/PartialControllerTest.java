@@ -1,6 +1,5 @@
-package de.christophgockel.httpserver.routes.responders;
+package de.christophgockel.httpserver.controllers;
 
-import de.christophgockel.httpserver.RequestMethod;
 import de.christophgockel.httpserver.StatusCode;
 import de.christophgockel.httpserver.filesystem.FileSystem;
 import de.christophgockel.httpserver.helper.RequestHelper;
@@ -15,23 +14,18 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-public class PartialResponderTest {
+public class PartialControllerTest {
+  private PartialController controller;
   @Rule
   public TemporaryFolder documentRoot = new TemporaryFolder();
-  private PartialResponder responder;
   private FileSystem fileSystem;
 
   @Before
   public void setup() throws IOException {
     fileSystem = new FileSystem(documentRoot.getRoot());
-    responder = new PartialResponder(fileSystem);
-  }
-
-  @Test
-  public void respondsToGetPostPut() {
-    assertTrue(responder.respondsTo(RequestMethod.GET, "/partial_content.txt"));
+    controller = new PartialController(fileSystem);
   }
 
   @Test
@@ -42,7 +36,7 @@ public class PartialResponderTest {
                      "Range: bytes=0-1\r\n\r\n";
     Request request = RequestHelper.requestFor(content);
 
-    Response response = responder.respond(request);
+    Response response = controller.dispatch(request);
     assertEquals(StatusCode.PARTIAL_CONTENT, response.getStatus());
 
     assertEquals("AB", new String(response.getBody()));
@@ -55,7 +49,7 @@ public class PartialResponderTest {
     String content = "GET /the_file.txt HTTP/1.1\r\n";
     Request request = RequestHelper.requestFor(content);
 
-    Response response = responder.respond(request);
+    Response response = controller.dispatch(request);
 
     assertEquals(StatusCode.OK, response.getStatus());
     assertEquals("ABC", new String(response.getBody()));
@@ -69,7 +63,7 @@ public class PartialResponderTest {
                      "Range: bytes=0\r\n\r\n";
     Request request = RequestHelper.requestFor(content);
 
-    Response response = responder.respond(request);
+    Response response = controller.dispatch(request);
 
     assertEquals(StatusCode.OK, response.getStatus());
     assertEquals("ABC", new String(response.getBody()));

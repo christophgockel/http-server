@@ -1,21 +1,21 @@
-package de.christophgockel.httpserver.routes.responders;
+package de.christophgockel.httpserver.controllers;
 
-import de.christophgockel.httpserver.RequestMethod;
 import de.christophgockel.httpserver.StatusCode;
 import de.christophgockel.httpserver.helper.RequestHelper;
 import de.christophgockel.httpserver.http.Request;
 import de.christophgockel.httpserver.http.Response;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-public class RedirectResponderTest {
-  @Test
-  public void respondsToGetOfSlashRedirect() {
-    RedirectResponder responder = new RedirectResponder(1234);
+public class RedirectControllerTest {
 
-    assertTrue(responder.respondsTo(RequestMethod.GET, "/redirect"));
+  private RedirectController controller;
+
+  @Before
+  public void setup() {
+    controller = new RedirectController(1234);
   }
 
   @Test
@@ -24,8 +24,7 @@ public class RedirectResponderTest {
                      "Host: www.somehost.com\r\n\r\n";
     Request request = RequestHelper.requestFor(content);
 
-    RedirectResponder responder = new RedirectResponder(1234);
-    Response response = responder.respond(request);
+    Response response = controller.dispatch(request);
 
     assertEquals(StatusCode.FOUND, response.getStatus());
     assertEquals("http://www.somehost.com:1234/", response.getHeaders().get("Location"));
@@ -37,8 +36,7 @@ public class RedirectResponderTest {
                      "Host: www.somehost.com:8080\r\n\r\n";
     Request request = RequestHelper.requestFor(content);
 
-    RedirectResponder responder = new RedirectResponder(1234);
-    Response response = responder.respond(request);
+    Response response = controller.dispatch(request);
 
     assertEquals(StatusCode.FOUND, response.getStatus());
     assertEquals("http://www.somehost.com:8080/", response.getHeaders().get("Location"));
@@ -49,8 +47,7 @@ public class RedirectResponderTest {
     String content = "GET /redirect HTTP/1.0\r\n";
     Request request = RequestHelper.requestFor(content);
 
-    RedirectResponder responder = new RedirectResponder(1234);
-    Response response = responder.respond(request);
+    Response response = controller.dispatch(request);
 
     assertEquals(StatusCode.FOUND, response.getStatus());
     assertEquals("http://localhost:1234/", response.getHeaders().get("Location"));

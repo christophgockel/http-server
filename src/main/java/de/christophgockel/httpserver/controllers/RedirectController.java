@@ -1,25 +1,19 @@
-package de.christophgockel.httpserver.routes.responders;
+package de.christophgockel.httpserver.controllers;
 
-import de.christophgockel.httpserver.RequestMethod;
 import de.christophgockel.httpserver.StatusCode;
 import de.christophgockel.httpserver.http.Request;
 import de.christophgockel.httpserver.http.Response;
 
-public class RedirectResponder extends BaseResponder {
+public class RedirectController extends Controller {
   private static final String LOCALHOST = "localhost";
   private final int defaultPort;
 
-  public RedirectResponder(int defaultPort) {
+  public RedirectController(int defaultPort) {
     this.defaultPort = defaultPort;
   }
 
   @Override
-  protected boolean respondsTo(RequestMethod method, String path) {
-    return method == RequestMethod.GET && path.equals("/redirect");
-  }
-
-  @Override
-  protected Response respond(Request request) {
+  protected Response get(Request request) {
     Response response = new Response(StatusCode.FOUND);
 
     response.addHeader("Location", "http://" + getHostAndPort(request) + "/");

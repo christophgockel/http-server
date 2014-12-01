@@ -1,6 +1,5 @@
-package de.christophgockel.httpserver.routes.responders;
+package de.christophgockel.httpserver.controllers;
 
-import de.christophgockel.httpserver.RequestMethod;
 import de.christophgockel.httpserver.StatusCode;
 import de.christophgockel.httpserver.filesystem.FileSystem;
 import de.christophgockel.httpserver.helper.RequestHelper;
@@ -15,24 +14,19 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
-public class PatchResponderTest {
+public class PatchControllerTest {
   @Rule
   public TemporaryFolder documentRoot = new TemporaryFolder();
-  private PatchResponder responder;
+  private PatchController controller;
   private FileSystem fileSystem;
 
   @Before
   public void setup() {
     fileSystem = new FileSystem(documentRoot.getRoot());
-    responder = new PatchResponder(fileSystem);
-  }
-
-  @Test
-  public void respondsToParticularResource() {
-    assertTrue(responder.respondsTo(RequestMethod.PATCH, "/patch-content.txt"));
-    assertTrue(responder.respondsTo(RequestMethod.GET, "/patch-content.txt"));
+    controller = new PatchController(fileSystem);
   }
 
   @Test
@@ -49,7 +43,7 @@ public class PatchResponderTest {
                      "new content";
     Request request = RequestHelper.requestFor(content);
 
-    assertEquals(StatusCode.NO_CONTENT, responder.respond(request).getStatus());
+    assertEquals(StatusCode.NO_CONTENT, controller.dispatch(request).getStatus());
     assertArrayEquals("new content\n".getBytes(), fileSystem.getFileContent("patch-content.txt"));
   }
 
@@ -57,13 +51,13 @@ public class PatchResponderTest {
   public void doesNotPatchWithoutValidETag() throws IOException {
     documentRoot.newFile("patch-content.txt");
     String content = "PATCH /patch-content.txt HTTP/1.1\r\n" +
-      "If-Match: 123\r\n" +
-      "Content-Length: 11\r\n" +
-      "\r\n" +
-      "new content";
+                     "If-Match: 123\r\n" +
+                     "Content-Length: 11\r\n" +
+                     "\r\n" +
+                     "new content";
     Request request = RequestHelper.requestFor(content);
 
-    assertEquals(StatusCode.PRECONDITION_FAILED, responder.respond(request).getStatus());
+    assertEquals(StatusCode.PRECONDITION_FAILED, controller.dispatch(request).getStatus());
   }
 
   @Test
@@ -76,7 +70,7 @@ public class PatchResponderTest {
     String content = "GET /patch-content.txt HTTP/1.1";
     Request request = RequestHelper.requestFor(content);
 
-    Response response = responder.respond(request);
+    Response response = controller.dispatch(request);
     assertEquals(StatusCode.OK, response.getStatus());
     assertArrayEquals("the content".getBytes(), response.getBody());
   }
@@ -86,18 +80,18 @@ public class PatchResponderTest {
     String content = "PATCH /unknown_file.txt HTTP/1.1\r\n";
     Request request = RequestHelper.requestFor(content);
 
-    assertEquals(StatusCode.NOT_FOUND, responder.respond(request).getStatus());
+    assertEquals(StatusCode.NOT_FOUND, controller.dispatch(request).getStatus());
   }
 
   @Test
   public void returnsPreconditionFailedWhenNoHashGiven() throws IOException {
     documentRoot.newFile("patch-content.txt");
     String content = "PATCH /patch-content.txt HTTP/1.1\r\n" +
-      "Content-Length: 11\r\n" +
-      "\r\n" +
-      "new content";
+                     "Content-Length: 11\r\n" +
+                     "\r\n" +
+                     "new content";
     Request request = RequestHelper.requestFor(content);
 
-    assertEquals(StatusCode.PRECONDITION_FAILED, responder.respond(request).getStatus());
+    assertEquals(StatusCode.PRECONDITION_FAILED, controller.dispatch(request).getStatus());
   }
 }
