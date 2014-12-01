@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class LogResponderTest {
-  private BaseResponder responder;
+  private LogResponder responder;
 
   @Before
   public void setup() {

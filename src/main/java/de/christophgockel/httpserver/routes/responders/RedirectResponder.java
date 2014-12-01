@@ -6,10 +6,11 @@ import de.christophgockel.httpserver.http.Request;
 import de.christophgockel.httpserver.http.Response;
 
 public class RedirectResponder extends BaseResponder {
-  private final int port;
+  private static final String LOCALHOST = "localhost";
+  private final int defaultPort;
 
-  public RedirectResponder(int port) {
-    this.port = port;
+  public RedirectResponder(int defaultPort) {
+    this.defaultPort = defaultPort;
   }
 
   @Override
@@ -20,8 +21,29 @@ public class RedirectResponder extends BaseResponder {
   @Override
   protected Response respond(Request request) {
     Response response = new Response(StatusCode.FOUND);
-    response.addHeader("Location", "http://localhost:" + port + "/");
+
+    response.addHeader("Location", "http://" + getHostAndPort(request) + "/");
 
     return response;
+  }
+
+  private String getHostAndPort(Request request) {
+    String host = getHost(request);
+
+    if (!host.contains(":")) {
+      host += ":" + defaultPort;
+    }
+
+    return host;
+  }
+
+  private String getHost(Request request) {
+    String host = request.getHeaders().get("Host");
+
+    if (host == null) {
+      host = LOCALHOST;
+    }
+
+    return host;
   }
 }

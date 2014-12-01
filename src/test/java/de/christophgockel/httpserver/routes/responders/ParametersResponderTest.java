@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertTrue;
 
 public class ParametersResponderTest {
-  private BaseResponder responder;
+  private ParametersResponder responder;
 
   @Before
   public void setup() {
@@ -27,10 +27,10 @@ public class ParametersResponderTest {
 
   @Test
   public void putsParametersIntoTheBody() throws IOException {
-    String content = "GET /parameters?horse HTTP/1.1\r\n";
+    String content = "GET /parameters?someparam HTTP/1.1\r\n";
     Response response = responder.respond(RequestHelper.requestFor(content));
 
-    assertContains(response, "horse");
+    assertContains(response, "someparam");
   }
 
   @Test
@@ -48,6 +48,14 @@ public class ParametersResponderTest {
 
     assertContains(response, "var1 = val1");
     assertContains(response, "var2 = val2");
+  }
+
+  @Test
+  public void displaysMessageWhenNoParametersGiven() throws IOException {
+    String content = "GET /parameters HTTP/1.1\r\n";
+    Response response = responder.respond(RequestHelper.requestFor(content));
+
+    assertContains(response, "No Parameters");
   }
 
   private void assertContains(Response response, String expected) throws IOException {

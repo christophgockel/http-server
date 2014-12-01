@@ -19,4 +19,8 @@ public class Logger {
   public static List<String> getEntries() {
     return new ArrayList<>(entries);
   }
+
+  public static void clear() {
+    entries.clear();
+  }
 }

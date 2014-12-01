@@ -98,15 +98,11 @@ public class FileSystem {
     return DigestUtils.sha1Hex(getFileContent(pathToFile));
   }
 
-  public void createNewFile(String pathToFile, String content) {
-
-  }
-
   public void deleteFile(String pathToFile) {
     try {
       Files.deleteIfExists(Paths.get(root.getPath() + File.separator + pathToFile));
     } catch (IOException e) {
-      //
+      // file didn't exist, ignore
     }
   }
 

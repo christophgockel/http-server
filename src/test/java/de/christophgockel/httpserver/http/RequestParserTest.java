@@ -2,9 +2,10 @@ package de.christophgockel.httpserver.http;
 
 import de.christophgockel.httpserver.RequestMethod;
 import de.christophgockel.httpserver.helper.RequestHelper;
-import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,10 +14,10 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class RequestTest {
+public class RequestParserTest {
   @Test
-  public void knowsTheDifferentRequestMethods() {
-    Assert.assertEquals(RequestMethod.GET, methodFor("GET / HTTP/1.1"));
+  public void parsesDifferentRequestMethods() {
+    assertEquals(RequestMethod.GET, methodFor("GET / HTTP/1.1"));
     assertEquals(RequestMethod.POST, methodFor("POST / HTTP/1.1"));
     assertEquals(RequestMethod.HEAD, methodFor("HEAD / HTTP/1.1"));
     assertEquals(RequestMethod.DELETE, methodFor("DELETE / HTTP/1.1"));
@@ -26,7 +27,7 @@ public class RequestTest {
   }
 
   @Test
-  public void providesURIInformations() {
+  public void parsesRequestURIs() {
     assertEquals("/some/long/path", uriFor("GET /some/long/path HTTP/1.1"));
     assertEquals("https://www.google.de", uriFor("GET https://www.google.de HTTP/1.1"));
     assertEquals("*", uriFor("OPTIONS * HTTP/1.1"));
@@ -82,7 +83,7 @@ public class RequestTest {
     assertThat(request.getBody(), containsString("some body"));
   }
 
-  @Test(expected = Request.MalformedException.class)
+  @Test(expected = RequestParser.MalformedException.class)
   public void throwsExceptionOnMalformedRequest() {
     requestFor("");
   }
@@ -92,16 +93,21 @@ public class RequestTest {
     methodFor("SOMETHING / HTTP/1.1");
   }
 
-  @Test(expected = Request.MalformedException.class)
+  @Test(expected = RequestParser.MalformedException.class)
   public void throwsExceptionOnMalformedRequestLine() {
     requestFor("GET");
   }
 
-  @Test(expected = Request.MalformedException.class)
-  public void throwExceptionForMalformedHeaders() {
+  @Test(expected = RequestParser.MalformedException.class)
+  public void throwsExceptionForMalformedHeaders() {
     String content = "PUT / HTTP/1.1\r\n" +
                      "Accept-Charset";
     requestFor(content);
+  }
+  @Test(expected = RequestParser.MalformedException.class)
+  public void throwsExceptionForMalformedRequest() {
+    RequestParser parser = new RequestParser();
+    parser.parse(new ExceptionThrowingInputStream());
   }
 
   @Test
@@ -114,12 +120,13 @@ public class RequestTest {
 
   @Test
   public void parsesURIParameters() {
-    String content = "GET /resource?parameter=value&other=%20%3C%2C%20 HTTP/1.1\r\n";
+    String content = "GET /resource?parameter=value&other=%20%3C%2C%20&onemoreparam HTTP/1.1\r\n";
     Request request = requestFor(content);
 
     assertTrue(request.hasParameters());
     assertEquals("value", request.getParameters().get("parameter"));
     assertEquals(" <, ", request.getParameters().get("other"));
+    assertEquals("", request.getParameters().get("onemoreparam"));
   }
 
   private RequestMethod methodFor(String requestLine) {
@@ -132,5 +139,12 @@ public class RequestTest {
 
   private Request requestFor(String requestLine) {
     return RequestHelper.requestFor(requestLine);
+  }
+
+  private class ExceptionThrowingInputStream extends InputStream {
+    @Override
+    public int read() throws IOException {
+      throw new IOException();
+    }
   }
 }

@@ -11,8 +11,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -22,7 +20,7 @@ import static org.junit.Assert.*;
 public class FormResponderTest {
   @Rule
   public TemporaryFolder documentRoot = new TemporaryFolder();
-  private BaseResponder responder;
+  private FormResponder responder;
   private FileSystem fileSystem;
 
   @Before
@@ -37,23 +35,6 @@ public class FormResponderTest {
     assertTrue(responder.respondsTo(RequestMethod.GET, "/form"));
     assertTrue(responder.respondsTo(RequestMethod.POST, "/form"));
     assertTrue(responder.respondsTo(RequestMethod.PUT, "/form"));
-  }
-
-  @Test
-  public void clearsExistingDataFileOnInstantiation() throws IOException {
-    File file = documentRoot.newFile("form_data.txt");
-    FileWriter writer = new FileWriter(file);
-    writer.write("old content");
-    writer.close();
-
-    String content = "GET /form HTTP/1.1";
-    Request request = RequestHelper.requestFor(content);
-
-    responder = new FormResponder(fileSystem);
-    Response response = responder.respond(request);
-
-    assertEquals(StatusCode.OK, response.getStatus());
-    assertArrayEquals("".getBytes(), response.getBody());
   }
 
   @Test

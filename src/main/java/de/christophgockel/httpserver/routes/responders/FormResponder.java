@@ -12,7 +12,6 @@ public class FormResponder extends BaseResponder {
 
   public FormResponder(FileSystem fileSystem) {
     this.fileSystem = fileSystem;
-    initialize();
   }
 
   @Override
@@ -33,10 +32,6 @@ public class FormResponder extends BaseResponder {
       response.setBody(fileSystem.getFileContent(DATA_FILE));
     }
     return response;
-  }
-
-  private void initialize() {
-    fileSystem.deleteFile(DATA_FILE);
   }
 
   private boolean isPostOrPut(Request request) {

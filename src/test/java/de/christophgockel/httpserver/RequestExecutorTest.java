@@ -1,16 +1,15 @@
 package de.christophgockel.httpserver;
 
+import de.christophgockel.httpserver.http.StubSocket;
 import de.christophgockel.httpserver.routes.Router;
-import de.christophgockel.httpserver.routes.responders.DummyResponder;
+import de.christophgockel.httpserver.routes.responders.NonRespondingResponder;
 import org.junit.Test;
 
-import java.io.*;
-import java.net.Socket;
+import java.io.IOException;
+import java.io.OutputStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
 
 public class RequestExecutorTest {
@@ -18,13 +17,9 @@ public class RequestExecutorTest {
   private RequestExecutor executor;
 
   public void prepareExecutorFor(String request) throws IOException {
-    InputStream inputStream = new ByteArrayInputStream(request.getBytes());
-    outputStream = new ByteArrayOutputStream();
-    Socket mockedSocket = mock(Socket.class);
-    when(mockedSocket.getInputStream()).thenReturn(inputStream);
-    when(mockedSocket.getOutputStream()).thenReturn(outputStream);
-
-    executor = new RequestExecutor(mockedSocket, new Router(new DummyResponder()));
+    StubSocket socket = new StubSocket(request);
+    outputStream = socket.getOutputStream();
+    executor = new RequestExecutor(socket, new Router(new NonRespondingResponder()));
   }
 
   @Test
@@ -43,8 +38,38 @@ public class RequestExecutorTest {
 
   @Test
   public void logsEveryRequest() throws IOException {
+    Logger.clear();
     prepareExecutorFor("GET /something HTTP/1.1");
     executor.run();
     assertEquals("GET /something HTTP/1.1", Logger.getEntries().get(0));
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void throwsRuntimeErrorWhenCatchHandlerCannotDealWithFailuresAnymore() {
+    ThrowingClientSocket socket = new ThrowingClientSocket();
+    executor = new RequestExecutor(socket, new Router(new NonRespondingResponder()));
+    executor.run();
+  }
+
+  private class ThrowingClientSocket extends StubSocket {
+    public ThrowingClientSocket() {
+      super("");
+    }
+
+    @Override
+    public OutputStream getOutputStream() throws IOException {
+      return new ThrowingOutputStream();
+    }
+
+    @Override
+    public void close() throws IOException {
+    }
+  }
+
+  private class ThrowingOutputStream extends OutputStream {
+    @Override
+    public void write(int b) throws IOException {
+      throw new IOException();
+    }
   }
 }

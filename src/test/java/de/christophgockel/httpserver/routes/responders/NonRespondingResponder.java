@@ -4,7 +4,7 @@ import de.christophgockel.httpserver.RequestMethod;
 import de.christophgockel.httpserver.http.Response;
 import de.christophgockel.httpserver.http.Request;
 
-public class DummyResponder extends BaseResponder {
+public class NonRespondingResponder extends BaseResponder {
   @Override
   protected boolean respondsTo(RequestMethod method, String path) {
     return false;
