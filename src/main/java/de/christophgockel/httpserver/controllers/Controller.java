@@ -8,8 +8,6 @@ import static de.christophgockel.httpserver.StatusCode.NOT_ALLOWED;
 public class Controller {
   public final Response dispatch(Request request) {
     switch (request.getMethod()) {
-      case GET:
-        return get(request);
       case PUT:
         return put(request);
       case POST:
@@ -26,8 +24,9 @@ public class Controller {
         return options(request);
       case PATCH:
         return patch(request);
+      default:
+        return get(request);
     }
-    return null;
   }
 
   protected Response get(Request request) {
