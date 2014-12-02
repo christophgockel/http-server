@@ -47,7 +47,7 @@ public class RequestExecutorTest {
   }
 
   @Test
-  public void something() throws IOException {
+  public void returnsResponseFromDenyingFilter() throws IOException {
     FilterChain filters = new DenyingFilterChain();
     StubSocket socket = new StubSocket("GET / HTTP/1.1");
     outputStream = socket.getOutputStream();
@@ -63,18 +63,16 @@ public class RequestExecutorTest {
 
     @Override
     public OutputStream getOutputStream() throws IOException {
-      return new ThrowingOutputStream();
+      return new OutputStream() {
+        @Override
+        public void write(int b) throws IOException {
+          throw new IOException();
+        }
+      };
     }
 
     @Override
     public void close() throws IOException {
-    }
-  }
-
-  private class ThrowingOutputStream extends OutputStream {
-    @Override
-    public void write(int b) throws IOException {
-      throw new IOException();
     }
   }
 
