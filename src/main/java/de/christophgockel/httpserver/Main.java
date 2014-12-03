@@ -5,7 +5,6 @@ import de.christophgockel.httpserver.filesystem.FileSystem;
 import de.christophgockel.httpserver.filtering.FilterChain;
 import de.christophgockel.httpserver.filtering.filters.AuthenticationFilter;
 import de.christophgockel.httpserver.filtering.filters.LoggingFilter;
-import de.christophgockel.httpserver.http.DefaultServerSocket;
 import de.christophgockel.httpserver.http.ServerSocket;
 import de.christophgockel.httpserver.routing.Router;
 import de.christophgockel.httpserver.util.Arguments;
@@ -23,7 +22,7 @@ public class Main {
     final FilterChain filters = createFilterChain();
 
     try {
-      ServerSocket socket = new DefaultServerSocket(new java.net.ServerSocket(arguments.getPort()));
+      ServerSocket socket = new ServerSocket(new java.net.ServerSocket(arguments.getPort()));
       server = new HttpServer(socket, Executors.newFixedThreadPool(5), router, filters);
       server.start();
     } catch (IOException e) {

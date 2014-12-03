@@ -2,13 +2,14 @@ package de.christophgockel.httpserver.http;
 
 import java.io.IOException;
 
-public class StubServerSocket implements ServerSocket {
+public class StubServerSocket extends ServerSocket {
   private boolean closed;
   private boolean alreadyAccepted;
-  private final StubSocket clientSocket;
+  private final StubClientSocket clientSocket;
 
   public StubServerSocket(String clientContent) {
-    clientSocket = new StubSocket(clientContent);
+    super(null);
+    clientSocket = new StubClientSocket(clientContent);
     closed = false;
     alreadyAccepted = false;
   }

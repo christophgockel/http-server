@@ -5,7 +5,7 @@ import de.christophgockel.httpserver.filtering.FilterChain;
 import de.christophgockel.httpserver.filtering.FilterResult;
 import de.christophgockel.httpserver.http.Request;
 import de.christophgockel.httpserver.http.Response;
-import de.christophgockel.httpserver.http.StubSocket;
+import de.christophgockel.httpserver.http.StubClientSocket;
 import de.christophgockel.httpserver.routing.Router;
 import org.junit.Test;
 
@@ -20,7 +20,7 @@ public class RequestExecutorTest {
   private RequestExecutor executor;
 
   public void prepareExecutorFor(String request) throws IOException {
-    StubSocket socket = new StubSocket(request);
+    StubClientSocket socket = new StubClientSocket(request);
     outputStream = socket.getOutputStream();
     executor = new RequestExecutor(socket, new Router(new DummyController()));
   }
@@ -49,14 +49,14 @@ public class RequestExecutorTest {
   @Test
   public void returnsResponseFromDenyingFilter() throws IOException {
     FilterChain filters = new DenyingFilterChain();
-    StubSocket socket = new StubSocket("GET / HTTP/1.1");
+    StubClientSocket socket = new StubClientSocket("GET / HTTP/1.1");
     outputStream = socket.getOutputStream();
     executor = new RequestExecutor(socket, new Router(new DummyController()), filters);
     executor.run();
     assertThat(outputStream.toString(), containsString("Not Implemented"));
   }
 
-  private class ThrowingClientSocket extends StubSocket {
+  private class ThrowingClientSocket extends StubClientSocket {
     public ThrowingClientSocket() {
       super("");
     }

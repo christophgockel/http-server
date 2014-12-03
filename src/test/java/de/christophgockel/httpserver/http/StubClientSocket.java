@@ -2,11 +2,12 @@ package de.christophgockel.httpserver.http;
 
 import java.io.*;
 
-public class StubSocket implements ClientSocket {
+public class StubClientSocket extends ClientSocket {
   private final InputStream inputStream;
   private final OutputStream outputStream;
 
-  public StubSocket(String inputContent) {
+  public StubClientSocket(String inputContent) {
+    super(null);
     inputStream = new ByteArrayInputStream(inputContent.getBytes());
     outputStream = new ByteArrayOutputStream();
   }
